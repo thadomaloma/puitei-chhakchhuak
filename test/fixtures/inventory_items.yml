@@ -1,0 +1,46 @@
+silk:
+  shop: primary
+  branch: main
+  name: Navy silk blend
+  sku: FAB-NVY-001
+  category: 0
+  unit: 0
+  color: Midnight navy
+  supplier_name: Main Textile Supplier
+  supplier_contact: 9862402001
+  cost_price: 500
+  selling_price: 700
+  quantity_on_hand: 20
+  quantity_reserved: 0
+  reorder_level: 5
+  active: true
+  notes: 44 inch width
+
+low_thread:
+  shop: primary
+  branch: main
+  name: Gold embroidery thread
+  sku: THR-GLD-001
+  category: 1
+  unit: 3
+  color: Muted gold
+  cost_price: 80
+  selling_price: 110
+  quantity_on_hand: 3
+  quantity_reserved: 0
+  reorder_level: 5
+  active: true
+
+other_silk:
+  shop: primary
+  branch: second
+  name: Other branch silk
+  sku: FAB-OTH-001
+  category: 0
+  unit: 0
+  cost_price: 450
+  selling_price: 650
+  quantity_on_hand: 12
+  quantity_reserved: 0
+  reorder_level: 4
+  active: true

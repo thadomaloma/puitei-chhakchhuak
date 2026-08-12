@@ -1,0 +1,35 @@
+<% filter_params = request.query_parameters.except("page") %>
+<div class="filter-command-bar mt-5 hidden xl:flex">
+  <%= form_with url: payments_path, method: :get, class: "flex min-w-56 flex-1 items-center gap-2" do |form| %>
+    <% %i[status payment_method from to].each do |name| %><%= form.hidden_field name, value: params[name] if params[name].present? %><% end %>
+    <div class="relative min-w-0 flex-1"><span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-muted"><%= ui_icon("search", size: 16) %></span><%= form.label :query, t("payments.search"), class: "sr-only" %><%= form.search_field :query, value: params[:query], placeholder: t("payments.search"), class: "form-input mt-0 pl-9", autocomplete: "off" %></div>
+    <%= form.button class: "button-secondary button-icon", aria: { label: t("forms.search") } do %><%= ui_icon("search", size: 16) %><% end %>
+  <% end %>
+
+  <nav class="segmented-control" aria-label="<%= t('payments.status') %>">
+    <% [["active", nil], ["all", "all"], ["voided", "voided"]].each do |label, value| %>
+      <% active = value ? params[:status] == value : params[:status].blank? %>
+      <% path = value ? payments_path(filter_params.merge("status" => value)) : payments_path(filter_params.except("status")) %>
+      <%= link_to t("payments.statuses.#{label}"), path, class: "segmented-item #{'segmented-item-active' if active}", aria: (active ? { current: "page" } : {}) %>
+    <% end %>
+  </nav>
+
+  <%= render "shared/date_range_popover",
+    path: payments_path,
+    translation_scope: "payments",
+    hidden_fields: { query: params[:query], status: params[:status], payment_method: params[:payment_method] },
+    today_path: payments_path(filter_params.except("from", "to").merge(from: Date.current, to: Date.current)),
+    month_path: payments_path(filter_params.except("from", "to").merge(from: Date.current.beginning_of_month, to: Date.current)),
+    clear_path: payments_path(filter_params.except("from", "to")) %>
+
+  <details class="relative" data-controller="popover" data-action="toggle->popover#keepOneOpen click@window->popover#closeOnOutside keydown.esc@window->popover#closeOnEscape">
+    <summary class="button-secondary cursor-pointer list-none" aria-label="<%= t('payments.more_filters') %>"><%= ui_icon("settings", size: 16) %><%= t("payments.more_filters") %><% if params[:payment_method].present? %><span class="grid size-5 place-items-center rounded-full bg-brand text-[10px] font-semibold text-white">1</span><% end %></summary>
+    <div class="filter-popover right-0 w-72"><div><p class="eyebrow"><%= t("payments.secondary_filter_eyebrow") %></p><h2 class="mt-1 text-sm font-semibold text-ink"><%= t("payments.method") %></h2></div>
+      <%= form_with url: payments_path, method: :get, class: "mt-3" do |form| %>
+        <% %i[query status from to].each do |name| %><%= form.hidden_field name, value: params[name] if params[name].present? %><% end %>
+        <%= form.label :payment_method, t("payments.method"), class: "sr-only" %><%= form.select :payment_method, [[t("payments.all_methods"), ""]] + Payment.payment_methods.keys.map { |method| [t("payments.methods.#{method}"), method] }, { selected: params[:payment_method] }, class: "form-input mt-0" %>
+        <div class="mt-3 flex items-center justify-between gap-2"><%= link_to t("forms.clear"), payments_path(filter_params.except("payment_method")), class: "button-ghost button-sm" %><%= form.submit t("payments.apply_filters"), class: "button-primary button-sm" %></div>
+      <% end %>
+    </div>
+  </details>
+</div>

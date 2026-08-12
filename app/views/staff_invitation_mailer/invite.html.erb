@@ -1,0 +1,3 @@
+<h1><%= t("saas.invitation_email_title", shop: @invitation.shop.name) %></h1>
+<p><%= t("saas.invitation_email_body", inviter: @invitation.invited_by.name, shop: @invitation.shop.name, role: @invitation.role.humanize, expires: l(@invitation.expires_at.to_date)) %></p>
+<p><%= link_to t("saas.accept_invitation"), @accept_url %></p>

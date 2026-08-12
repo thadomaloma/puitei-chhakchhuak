@@ -1,0 +1,50 @@
+<%= form_with model: design, class: "space-y-4", data: { controller: "image-preview" } do |form| %>
+  <%= render "shared/form_errors", record: design %>
+  <div class="grid items-start gap-4 lg:grid-cols-[minmax(0,1.1fr)_minmax(22rem,0.9fr)]">
+    <div class="space-y-4">
+      <section class="form-section">
+        <div><h2 class="section-title"><%= t("designs.design_details") %></h2><p class="supporting-text"><%= t("designs.design_details_description") %></p></div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-2"><%= form.label :title, t("designs.name"), class: "form-label" %><%= form.text_field :title, class: "form-input", required: true, autofocus: true, maxlength: 140, autocomplete: "off", placeholder: t("designs.name_placeholder") %></div>
+          <div><%= form.label :garment_type, t("designs.garment_type"), class: "form-label" %><%= form.collection_select :garment_type, @garment_templates, :garment_type, :name, { prompt: t("designs.choose_garment") }, class: "form-input", required: true %></div>
+          <div><%= form.label :visibility, t("designs.visibility"), class: "form-label" %><%= form.select :visibility, %w[private customer_shareable].map { |value| [t("designs.visibilities.#{value}"), value] }, {}, class: "form-input" %><p class="mt-1 text-[11px] text-ink-muted"><%= t("designs.visibility_hint") %></p></div>
+          <div class="sm:col-span-2"><%= form.label :description, t("designs.design_description"), class: "form-label" %><%= form.text_area :description, rows: 4, class: "form-input", placeholder: t("designs.description_placeholder") %></div>
+          <div class="sm:col-span-2"><%= form.label :tag_list, t("designs.tags"), class: "form-label" %><%= form.text_field :tag_list, value: design.tag_list, class: "form-input", autocomplete: "off", placeholder: t("designs.tags_placeholder") %><p class="mt-1 text-[11px] text-ink-muted"><%= t("designs.tags_hint") %></p></div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <div><h2 class="section-title"><%= t("designs.construction_notes") %></h2><p class="supporting-text"><%= t("designs.construction_description") %></p></div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <% %i[colour_family fabric_type embroidery_style sleeve_style neck_style occasion].each do |field| %><div><%= form.label field, t("designs.#{field}"), class: "form-label" %><%= form.text_field field, class: "form-input", autocomplete: "off" %></div><% end %>
+          <div><%= form.label :estimated_price, t("designs.estimated_price"), class: "form-label" %><%= form.number_field :estimated_price, class: "form-input tabular", min: 0, step: "0.01", inputmode: "decimal" %></div>
+          <div><%= form.label :estimated_minutes, t("designs.estimated_minutes"), class: "form-label" %><%= form.number_field :estimated_minutes, class: "form-input tabular", min: 1, step: 1, inputmode: "numeric" %></div>
+          <div class="sm:col-span-2"><%= form.label :internal_notes, t("designs.internal_notes"), class: "form-label" %><%= form.text_area :internal_notes, rows: 4, class: "form-input", placeholder: t("designs.internal_notes_placeholder") %></div>
+        </div>
+      </section>
+
+      <section class="form-section">
+        <div><h2 class="section-title"><%= t("designs.source_rights") %></h2><p class="supporting-text"><%= t("designs.source_rights_description") %></p></div>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div><%= form.label :source_type, t("designs.source_type"), class: "form-label" %><%= form.select :source_type, Design.source_types.keys.map { |value| [t("designs.sources.#{value}"), value] }, {}, class: "form-input" %></div>
+          <div><%= form.label :source_name, t("designs.source_name"), class: "form-label" %><%= form.text_field :source_name, class: "form-input", autocomplete: "off" %></div>
+          <div class="sm:col-span-2"><%= form.label :source_url, t("designs.source_url"), class: "form-label" %><%= form.url_field :source_url, class: "form-input", autocomplete: "url", placeholder: "https://" %></div>
+          <% unless design.persisted? %><label class="sm:col-span-2 flex items-start gap-3 rounded-xl border border-line bg-surface-muted p-3.5 text-xs text-ink"><%= form.check_box :rights_confirmed, { class: "mt-0.5 size-4 shrink-0 rounded border-line text-brand", required: true }, "1", "0" %><span><strong class="block font-semibold"><%= t("designs.rights_confirmation") %></strong><span class="mt-0.5 block text-ink-muted"><%= t("designs.rights_confirmation_description") %></span></span></label><% end %>
+        </div>
+      </section>
+    </div>
+
+    <section class="form-section lg:sticky lg:top-5">
+      <div><h2 class="section-title"><%= t("designs.images") %></h2><p class="supporting-text"><%= t("designs.images_description") %></p></div>
+      <% persisted_attachments = design.images.attachments.select(&:persisted?) %>
+      <% if persisted_attachments.any? %>
+        <fieldset class="mt-4"><legend class="text-xs font-semibold text-ink"><%= t("designs.current_images") %></legend><div class="mt-2 grid grid-cols-2 gap-3">
+          <% persisted_attachments.each do |attachment| %><div class="overflow-hidden rounded-xl border border-line bg-surface"><%= image_tag attachment.variant(:thumb), alt: design.title, class: "aspect-[4/5] w-full object-cover", width: 240, height: 300 %><div class="space-y-2 p-2.5"><label class="flex items-center gap-2 text-[11px] font-medium text-ink"><%= radio_button_tag "design[primary_image_attachment_id]", attachment.id, design.primary_image_attachment&.id == attachment.id, class: "size-4 border-line text-brand" %><%= t("designs.make_primary") %></label><label class="flex items-center gap-2 text-[11px] font-medium text-[#b42318]"><%= check_box_tag "design[remove_image_ids][]", attachment.id, false, class: "size-4 rounded border-line" %><%= t("designs.remove_image") %></label></div></div><% end %>
+        </div><p class="mt-2 text-[11px] text-ink-muted"><%= t("designs.keep_one_image") %></p></fieldset>
+      <% end %>
+      <div class="mt-4"><%= form.label :images, design.persisted? ? t("designs.add_images") : t("designs.choose_images"), class: "form-label" %><%= form.file_field :images, multiple: true, accept: "image/jpeg,image/png,image/webp", class: "file-input", required: !design.persisted?, data: { image_preview_target: "input", action: "change->image-preview#preview" } %><p class="mt-1 text-[11px] text-ink-muted"><%= t("designs.image_hint") %></p><div class="mt-3 hidden grid-cols-2 gap-3" data-image-preview-target="gallery"></div></div>
+    </section>
+  </div>
+
+  <div class="sticky-actions"><%= link_to t("forms.cancel"), design.persisted? ? design_path(design) : designs_path, class: "button-secondary flex-1 sm:flex-none" %><%= form.submit t("designs.save"), class: "button-primary flex-1 sm:flex-none" %></div>
+<% end %>

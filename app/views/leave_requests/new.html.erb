@@ -1,0 +1,12 @@
+<% content_for :title, t("leave_requests.new_title") %>
+<%= render "shared/back_link", path: leave_requests_path, label: t("leave_requests.title") %>
+<div class="mx-auto mt-4 max-w-2xl">
+  <%= render "shared/page_header", eyebrow: t("staff.eyebrow"), title: t("leave_requests.new"), description: t("leave_requests.new_description") %>
+  <%= form_with model: @leave_request, class: "section-card mt-5 space-y-4" do |form| %>
+    <%= render "shared/form_errors", record: @leave_request %>
+    <div><%= form.label :leave_type, t("leave_requests.type"), class: "form-label" %><%= form.select :leave_type, LeaveRequest.leave_types.keys.map { |type| [ t("leave_requests.types.#{type}"), type ] }, {}, class: "form-select" %></div>
+    <div class="grid gap-4 sm:grid-cols-2"><div><%= form.label :starts_on, t("leave_requests.starts_on"), class: "form-label" %><%= form.date_field :starts_on, min: Date.current, class: "form-input", required: true %></div><div><%= form.label :ends_on, t("leave_requests.ends_on"), class: "form-label" %><%= form.date_field :ends_on, min: Date.current, class: "form-input", required: true %></div></div>
+    <div><%= form.label :reason, t("leave_requests.reason"), class: "form-label" %><%= form.text_area :reason, rows: 4, class: "form-textarea", required: true, placeholder: t("leave_requests.reason_placeholder") %></div>
+    <div class="flex justify-end gap-2 border-t border-line pt-4"><%= link_to t("forms.cancel"), leave_requests_path, class: "button-secondary" %><%= form.submit t("leave_requests.submit"), class: "button-primary" %></div>
+  <% end %>
+</div>

@@ -1,0 +1,36 @@
+<% active_assignments = @staff_workloads.sum { |workload| workload[:active] } %>
+<section class="section-card" aria-labelledby="team-capacity-title">
+  <header class="flex items-start justify-between gap-3">
+    <div class="min-w-0">
+      <h2 id="team-capacity-title" class="section-title"><%= t("dashboard.team_capacity") %></h2>
+      <p class="supporting-text mt-0.5"><%= t("dashboard.team_capacity_description") %></p>
+    </div>
+    <% if policy(User).index? %><%= link_to staff_index_path, class: "button-ghost button-icon button-sm shrink-0", aria: { label: t("dashboard.view_all") } do %><%= ui_icon("arrow-right", size: 15) %><% end %><% end %>
+  </header>
+
+  <% if @staff_workloads.any? %>
+    <div class="mt-4 flex items-center justify-between rounded-lg border border-line bg-surface-muted/45 px-3 py-2">
+      <span class="text-[11px] font-medium text-ink-muted"><%= t("dashboard.active_assignments", count: active_assignments) %></span>
+      <span class="grid size-7 place-items-center rounded-md bg-surface text-emerald-refined shadow-sm"><%= ui_icon("staff", size: 14) %></span>
+    </div>
+    <div class="mt-2 divide-y divide-line">
+      <% @staff_workloads.each do |workload| %>
+        <div class="py-3 first:pt-2 last:pb-0">
+          <div class="flex items-center gap-2.5">
+            <%= render "shared/avatar", name: workload[:staff].name, size: "sm" %>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-3">
+                <p class="truncate text-xs font-semibold text-ink"><%= workload[:staff].name %></p>
+                <span class="shrink-0 tabular text-[10px] font-semibold <%= workload[:overdue].positive? ? 'text-[#b42318]' : 'text-ink-muted' %>"><%= t("dashboard.active_task", count: workload[:active]) %></span>
+              </div>
+              <p class="mt-0.5 truncate text-[10px] text-ink-muted"><%= workload[:role].humanize %> · <%= t("dashboard.due_overdue", due: workload[:due], overdue: workload[:overdue]) %></p>
+            </div>
+          </div>
+          <div class="ml-10 mt-2 h-1 overflow-hidden rounded-full bg-surface-muted"><progress class="progress-bar <%= 'progress-danger' if workload[:overdue].positive? %>" value="<%= workload[:load_percentage] %>" max="100" aria-hidden="true"></progress></div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="mt-3"><%= render "shared/empty_state", title: t("dashboard.no_workload"), description: t("dashboard.no_workload_description"), icon: "staff" %></div>
+  <% end %>
+</section>

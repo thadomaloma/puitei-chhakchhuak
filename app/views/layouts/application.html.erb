@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= content_for(:title) || t("app.name") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#00142a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="<%= t('app.name') %>">
+    <meta name="application-name" content="<%= t('app.name') %>">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= yield :head %>
+    <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+    <link rel="icon" href="/puitei-mark.svg?v=1" type="image/svg+xml" sizes="any">
+    <link rel="icon" href="/favicon-32.png?v=4" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4" sizes="180x180">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="app-canvas min-h-screen">
+    <a href="#main-content" class="fixed left-3 top-3 z-[100] -translate-y-20 rounded-lg bg-brand px-3 py-2 text-sm font-semibold text-white shadow-overlay transition-transform focus:translate-y-0"><%= t("forms.skip_to_content") %></a>
+    <% if user_signed_in? %>
+      <div class="min-h-screen lg:grid lg:grid-cols-[14.5rem_minmax(0,1fr)]">
+        <%= render "shared/sidebar" %>
+        <div class="min-w-0 pb-[calc(5.25rem+env(safe-area-inset-bottom))] lg:pb-0">
+          <%= render "shared/topbar" %>
+          <%= render "shared/flash" %>
+          <main id="main-content" class="mx-auto w-full max-w-[96rem] px-4 py-5 sm:px-6 sm:py-6 lg:px-6 lg:py-7 xl:px-8" tabindex="-1">
+            <%= yield %>
+          </main>
+        </div>
+        <%= render "shared/mobile_navigation" %>
+      </div>
+    <% else %>
+      <main id="main-content" class="flex min-h-screen items-center justify-center bg-page px-4 py-10" tabindex="-1">
+        <div class="w-full max-w-md">
+          <%= render "shared/flash" %>
+          <%= yield %>
+        </div>
+      </main>
+    <% end %>
+  </body>
+</html>

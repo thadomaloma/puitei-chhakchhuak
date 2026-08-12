@@ -1,0 +1,58 @@
+<% filter_params = request.query_parameters.except("page") %>
+<% selected_garment = @garment_templates.find { |template| template.garment_type == params[:garment_type] } %>
+<% secondary_filter_count = [params[:visibility], params[:source_type], params[:colour_family], params[:fabric_type], params[:occasion], params[:tag], params[:favourites]].count(&:present?) %>
+
+<div class="filter-command-bar mt-5 hidden xl:flex">
+  <%= form_with url: designs_path, method: :get, class: "flex min-w-56 flex-1 items-center gap-2" do |form| %>
+    <% %i[garment_type visibility source_type colour_family fabric_type occasion tag favourites archived].each do |name| %><%= form.hidden_field name, value: params[name] if params[name].present? %><% end %>
+    <div class="relative min-w-0 flex-1">
+      <span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-muted"><%= ui_icon("search", size: 16) %></span>
+      <%= form.label :query, t("designs.search"), class: "sr-only" %>
+      <%= form.search_field :query, value: params[:query], placeholder: t("designs.search_placeholder"), class: "form-input mt-0 pl-9", autocomplete: "off" %>
+    </div>
+    <%= form.button class: "button-secondary button-icon", aria: { label: t("forms.search") } do %><%= ui_icon("search", size: 16) %><% end %>
+  <% end %>
+
+  <details class="relative" data-controller="popover" data-action="toggle->popover#keepOneOpen click@window->popover#closeOnOutside keydown.esc@window->popover#closeOnEscape">
+    <summary class="button-secondary cursor-pointer list-none" aria-label="<%= t('designs.filter_by_garment') %>">
+      <%= ui_icon("ruler", size: 16) %>
+      <span class="max-w-32 truncate"><%= selected_garment&.name || t("designs.all_garments") %></span>
+      <%= ui_icon("chevron-down", size: 14) %>
+    </summary>
+    <div class="filter-popover left-0 w-72">
+      <div><p class="eyebrow"><%= t("designs.garment_filter_eyebrow") %></p><h2 class="mt-1 text-sm font-semibold text-ink"><%= t("designs.garment_type") %></h2></div>
+      <%= form_with url: designs_path, method: :get, class: "mt-3" do |form| %>
+        <% %i[query visibility source_type colour_family fabric_type occasion tag favourites archived].each do |name| %><%= form.hidden_field name, value: params[name] if params[name].present? %><% end %>
+        <%= form.label :garment_type, t("designs.garment_type"), class: "sr-only" %>
+        <%= form.select :garment_type, options_for_select([[t("designs.all_garments"), ""]] + @garment_templates.map { |template| [template.name, template.garment_type] }, params[:garment_type]), {}, class: "form-input mt-0" %>
+        <div class="mt-3 flex items-center justify-between gap-2"><%= link_to t("forms.clear"), designs_path(filter_params.except("garment_type")), class: "button-ghost button-sm" %><%= form.submit t("designs.apply_filters"), class: "button-primary button-sm" %></div>
+      <% end %>
+    </div>
+  </details>
+
+  <nav class="segmented-control" aria-label="<%= t('designs.view') %>">
+    <% [["active", nil], ["all", "1"]].each do |label, value| %>
+      <% active = value ? params[:archived] == value : params[:archived] != "1" %>
+      <% path = value ? designs_path(filter_params.merge("archived" => value)) : designs_path(filter_params.except("archived")) %>
+      <%= link_to t("designs.views.#{label}"), path, class: "segmented-item #{'segmented-item-active' if active}", aria: (active ? { current: "page" } : {}) %>
+    <% end %>
+  </nav>
+
+  <details class="relative" data-controller="popover" data-action="toggle->popover#keepOneOpen click@window->popover#closeOnOutside keydown.esc@window->popover#closeOnEscape">
+    <summary class="button-secondary cursor-pointer list-none" aria-label="<%= t('designs.more_filters') %>">
+      <%= ui_icon("settings", size: 16) %><%= t("designs.more_filters") %>
+      <% if secondary_filter_count.positive? %><span class="grid size-5 place-items-center rounded-full bg-brand text-[10px] font-semibold text-white"><%= secondary_filter_count %></span><% end %>
+    </summary>
+    <div class="filter-popover right-0 w-80">
+      <div><p class="eyebrow"><%= t("designs.secondary_filter_eyebrow") %></p><h2 class="mt-1 text-sm font-semibold text-ink"><%= t("designs.refine_library") %></h2></div>
+      <%= form_with url: designs_path, method: :get, class: "mt-3 space-y-3" do |form| %>
+        <% %i[query garment_type archived].each do |name| %><%= form.hidden_field name, value: params[name] if params[name].present? %><% end %>
+        <div><%= form.label :visibility, t("designs.visibility"), class: "mb-1.5 block text-xs font-semibold text-ink" %><%= form.select :visibility, options_for_select([[t("designs.all_visibility"), ""]] + %w[private customer_shareable].map { |value| [t("designs.visibilities.#{value}"), value] }, params[:visibility]), {}, class: "form-input mt-0" %></div>
+        <div><%= form.label :source_type, t("designs.source_type"), class: "mb-1.5 block text-xs font-semibold text-ink" %><%= form.select :source_type, options_for_select([[t("designs.all_sources"), ""]] + Design.source_types.keys.map { |value| [t("designs.sources.#{value}"), value] }, params[:source_type]), {}, class: "form-input mt-0" %></div>
+        <div class="grid grid-cols-2 gap-3"><% %i[colour_family fabric_type occasion tag].each do |attribute| %><div><%= form.label attribute, t("designs.#{attribute}"), class: "mb-1.5 block text-xs font-semibold text-ink" %><%= form.select attribute, options_for_select([[t("designs.any_option"), ""]] + @advanced_filter_options.fetch(attribute).map { |value| [value, value] }, params[attribute]), {}, class: "form-input mt-0" %></div><% end %></div>
+        <label class="flex min-h-10 items-center gap-2 rounded-xl border border-line px-3 text-xs font-medium text-ink-muted"><%= form.check_box :favourites, { checked: params[:favourites] == "1", class: "size-4 rounded border-line text-brand" }, "1", "0" %><%= t("design_favourites.only_saved") %></label>
+        <div class="flex items-center justify-between gap-2"><%= link_to t("forms.clear"), designs_path(filter_params.except("visibility", "source_type", "colour_family", "fabric_type", "occasion", "tag", "favourites")), class: "button-ghost button-sm" %><%= form.submit t("designs.apply_filters"), class: "button-primary button-sm" %></div>
+      <% end %>
+    </div>
+  </details>
+</div>

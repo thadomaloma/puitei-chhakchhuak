@@ -1,0 +1,13 @@
+primary:
+  name: Puitei Chhakchhuak Test Shop
+  slug: puitei-studio
+  country: India
+  active: true
+  onboarding_completed_at: <%= 1.day.ago %>
+
+foreign:
+  name: Foreign Boutique
+  slug: foreign-boutique
+  country: India
+  active: true
+  onboarding_completed_at: <%= 1.day.ago %>

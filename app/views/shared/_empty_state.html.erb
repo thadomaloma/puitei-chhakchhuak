@@ -1,0 +1,6 @@
+<div class="empty-state">
+  <span class="empty-state-mark"><%= ui_icon(local_assigns.fetch(:icon, "needle"), size: 23) %></span>
+  <h3 class="mt-4 text-base font-semibold text-ink"><%= title %></h3>
+  <% if local_assigns[:description].present? %><p class="mx-auto mt-1 max-w-md supporting-text"><%= description %></p><% end %>
+  <% if local_assigns[:action].present? %><div class="mt-5"><%= action %></div><% end %>
+</div>

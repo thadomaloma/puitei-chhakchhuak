@@ -1,0 +1,31 @@
+<%= form_with model: expense, class: "space-y-5" do |form| %>
+  <%= render "shared/form_errors", record: expense %>
+
+  <section class="section-card">
+    <div><h2 class="section-title"><%= t("expenses.details") %></h2><p class="supporting-text"><%= t("expenses.details_description") %></p></div>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div class="sm:col-span-2"><%= form.label :description, t("expenses.description"), class: "form-label" %><%= form.text_field :description, class: "form-input", placeholder: t("expenses.description_placeholder"), required: true, autofocus: true %></div>
+      <div><%= form.label :category, t("expenses.category"), class: "form-label" %><%= form.select :category, Expense.categories.keys.map { |key| [ t("expenses.categories.#{key}"), key ] }, { prompt: t("expenses.choose_category") }, class: "form-select", required: true %></div>
+      <div><%= form.label :amount, t("expenses.amount"), class: "form-label" %><div class="relative"><span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-ink-muted"><%= current_branch.shop_setting.currency %></span><%= form.number_field :amount, min: 0.01, step: 0.01, class: "form-input pl-12", required: true, inputmode: "decimal" %></div></div>
+      <div><%= form.label :incurred_on, t("expenses.incurred_on"), class: "form-label" %><%= form.date_field :incurred_on, max: Date.current, class: "form-input", required: true %></div>
+      <div><%= form.label :vendor, t("expenses.vendor"), class: "form-label" %><%= form.text_field :vendor, class: "form-input", placeholder: t("expenses.vendor_placeholder") %></div>
+    </div>
+  </section>
+
+  <section class="section-card">
+    <div><h2 class="section-title"><%= t("expenses.payment_details") %></h2><p class="supporting-text"><%= t("expenses.payment_description") %></p></div>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div><%= form.label :payment_method, t("expenses.payment_method"), class: "form-label" %><%= form.select :payment_method, Expense.payment_methods.keys.map { |key| [ t("payments.methods.#{key}"), key ] }, {}, class: "form-select" %></div>
+      <div><%= form.label :reference_number, t("expenses.reference"), class: "form-label" %><%= form.text_field :reference_number, class: "form-input", placeholder: t("expenses.reference_hint") %></div>
+      <div><%= form.label :recurrence_interval, t("expenses.recurrence"), class: "form-label" %><%= form.select :recurrence_interval, Expense.recurrence_intervals.keys.map { |key| [ t("expenses.recurrences.#{key}"), key ] }, {}, class: "form-select" %></div>
+      <div><%= form.label :next_due_on, t("expenses.next_due_on"), class: "form-label" %><%= form.date_field :next_due_on, class: "form-input" %><p class="form-hint"><%= t("expenses.next_due_hint") %></p></div>
+      <div class="sm:col-span-2"><%= form.label :notes, t("customers.notes"), class: "form-label" %><%= form.text_area :notes, rows: 3, class: "form-textarea", placeholder: t("expenses.notes_placeholder") %></div>
+      <div class="sm:col-span-2"><%= form.label :receipts, t("expenses.receipts"), class: "form-label" %><%= form.file_field :receipts, multiple: true, accept: "image/jpeg,image/png,image/webp,application/pdf", class: "form-file" %><p class="form-hint"><%= t("expenses.receipt_hint") %></p></div>
+    </div>
+  </section>
+
+  <div class="sticky bottom-[calc(4.25rem+env(safe-area-inset-bottom))] z-20 flex items-center justify-end gap-2 rounded-xl border border-line bg-surface/95 p-3 shadow-overlay backdrop-blur lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
+    <%= link_to t("forms.cancel"), expenses_path, class: "button-secondary" %>
+    <%= form.submit t("expenses.record"), class: "button-primary" %>
+  </div>
+<% end %>

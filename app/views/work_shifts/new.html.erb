@@ -1,0 +1,13 @@
+<% content_for :title, t("work_shifts.new_title") %>
+<%= render "shared/back_link", path: work_shifts_path, label: t("work_shifts.title") %>
+<div class="mx-auto mt-4 max-w-2xl">
+  <%= render "shared/page_header", eyebrow: t("staff.eyebrow"), title: t("work_shifts.new"), description: t("work_shifts.new_description") %>
+  <%= form_with model: @work_shift, class: "section-card mt-5 space-y-4" do |form| %>
+    <%= render "shared/form_errors", record: @work_shift %>
+    <div><%= form.label :user_id, t("staff.staff_member"), class: "form-label" %><%= form.select :user_id, @staff_options.map { |member| [ "#{member.name} · #{t("staff.roles.#{member.role_for(current_shop)}")}", member.id ] }, { prompt: t("work_shifts.choose_staff") }, class: "form-select", required: true %></div>
+    <div class="grid gap-4 sm:grid-cols-2"><div><%= form.label :starts_at, t("work_shifts.starts_at"), class: "form-label" %><%= form.datetime_local_field :starts_at, class: "form-input", required: true %></div><div><%= form.label :ends_at, t("work_shifts.ends_at"), class: "form-label" %><%= form.datetime_local_field :ends_at, class: "form-input", required: true %></div></div>
+    <div><%= form.label :location, t("work_shifts.location"), class: "form-label" %><%= form.text_field :location, class: "form-input", placeholder: t("work_shifts.location_placeholder") %></div>
+    <div><%= form.label :notes, t("customers.notes"), class: "form-label" %><%= form.text_area :notes, rows: 3, class: "form-textarea", placeholder: t("work_shifts.notes_placeholder") %></div>
+    <div class="flex justify-end gap-2 border-t border-line pt-4"><%= link_to t("forms.cancel"), work_shifts_path, class: "button-secondary" %><%= form.submit t("work_shifts.schedule"), class: "button-primary" %></div>
+  <% end %>
+</div>

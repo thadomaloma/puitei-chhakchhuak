@@ -1,0 +1,27 @@
+blouse_bust:
+  measurement_template: blouse
+  key: bust
+  label: Bust
+  position: 0
+  required: true
+
+blouse_waist:
+  measurement_template: blouse
+  key: waist
+  label: Waist
+  position: 1
+  required: true
+
+blouse_sleeve:
+  measurement_template: blouse
+  key: sleeve_length
+  label: Sleeve length
+  position: 2
+  required: false
+
+shirt_chest:
+  measurement_template: shirt
+  key: chest
+  label: Chest
+  position: 0
+  required: true

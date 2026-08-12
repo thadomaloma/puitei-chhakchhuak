@@ -1,0 +1,62 @@
+<% content_for :title, t("reports.index_title") %>
+
+<%= render "shared/page_header",
+  eyebrow: t("reports.eyebrow"),
+  title: t("reports.title"),
+  description: t("reports.description"),
+  action: link_to(ui_icon("reports", size: 17) + t("reports.export_csv"), export_reports_path(from: @from, to: @to), class: "button-primary") %>
+
+<section class="toolbar mt-5" aria-labelledby="report-period-title">
+  <%= form_with url: reports_path, method: :get, class: "grid w-full gap-3 sm:grid-cols-[minmax(0,1fr)_auto_auto_auto] sm:items-end" do |form| %>
+    <div><h2 id="report-period-title" class="text-xs font-semibold text-ink"><%= t("reports.period") %></h2><p class="mt-0.5 text-[11px] text-ink-muted"><%= t("reports.period_description") %></p></div>
+    <div><%= form.label :from, t("reports.from"), class: "form-label mt-0" %><%= form.date_field :from, value: @from, max: @to, class: "form-input mt-1" %></div>
+    <div><%= form.label :to, t("reports.to"), class: "form-label mt-0" %><%= form.date_field :to, value: @to, max: Date.current, class: "form-input mt-1" %></div>
+    <%= form.submit t("reports.apply"), class: "button-secondary" %>
+  <% end %>
+  <div class="mt-3 flex flex-wrap gap-1.5 border-t border-line pt-3">
+    <%= link_to t("reports.last_30_days"), reports_path(from: 29.days.ago.to_date, to: Date.current), class: "button-ghost button-sm" %>
+    <%= link_to t("reports.this_month"), reports_path(from: Date.current.beginning_of_month, to: Date.current), class: "button-ghost button-sm" %>
+    <%= link_to t("reports.this_quarter"), reports_path(from: Date.current.beginning_of_quarter, to: Date.current), class: "button-ghost button-sm" %>
+    <%= link_to t("reports.this_year"), reports_path(from: Date.current.beginning_of_year, to: Date.current), class: "button-ghost button-sm" %>
+  </div>
+</section>
+
+<% if @range_limited %><div class="mt-3 rounded-lg border border-[#fedf89] bg-[#fffaeb] px-3.5 py-3 text-xs text-[#93370d]" role="status"><%= t("reports.range_limited") %></div><% end %>
+
+<section class="mt-4 grid grid-cols-2 gap-2 xl:grid-cols-4" aria-label="<%= t('reports.financial_summary') %>">
+  <%= render "shared/stat_card", label: t("reports.revenue"), value: money(@report.summary[:revenue], @report.currency), detail: t("reports.active_receipts"), icon: "payments", tone: "premium" %>
+  <%= render "shared/stat_card", label: t("reports.expenses"), value: money(@report.summary[:expenses], @report.currency), detail: t("reports.approved_expenses"), icon: "expenses", tone: "warning" %>
+  <%= render "shared/stat_card", label: t("reports.net_profit"), value: money(@report.summary[:profit], @report.currency), detail: t("reports.revenue_less_expenses"), icon: "sparkles", tone: (@report.summary[:profit].negative? ? "danger" : "success") %>
+  <%= render "shared/stat_card", label: t("reports.order_value"), value: money(@report.summary[:order_value], @report.currency), detail: t("reports.orders_count", count: @report.summary[:orders]), icon: "orders", tone: "neutral" %>
+</section>
+
+<section class="mt-2 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line lg:grid-cols-4" aria-label="<%= t('reports.operational_summary') %>">
+  <% [[t("reports.new_customers"), @report.summary[:customers]], [t("reports.deliveries"), @report.summary[:deliveries]], [t("reports.average_order"), money(@report.summary[:average_order_value], @report.currency)], [t("reports.outstanding"), money(@report.summary[:outstanding], @report.currency)]].each do |label, value| %>
+    <article class="bg-surface px-3.5 py-3.5 sm:px-4"><p class="text-[11px] font-medium text-ink-muted"><%= label %></p><p class="mt-1 tabular text-base font-semibold tracking-tight text-ink"><%= value %></p></article>
+  <% end %>
+</section>
+
+<section class="section-card mt-4" aria-labelledby="trend-title">
+  <div class="flex items-start justify-between gap-3"><div><h2 id="trend-title" class="section-title"><%= t("reports.trend") %></h2><p class="supporting-text"><%= t("reports.trend_description") %></p></div><span class="status-badge status-neutral shrink-0"><%= l(@from) %> – <%= l(@to) %></span></div>
+  <% max_total = [@report.trend.flat_map { |row| [row[:revenue], row[:expenses]] }.max.to_d, 1.to_d].max %>
+  <div class="table-shell mt-4 hidden lg:block"><table class="data-table"><thead><tr><th><%= t("reports.month") %></th><th><%= t("reports.activity") %></th><th class="text-right"><%= t("reports.revenue") %></th><th class="text-right"><%= t("reports.expenses") %></th><th class="text-right"><%= t("reports.net_profit") %></th><th class="text-right"><%= t("reports.orders") %></th></tr></thead><tbody>
+    <% @report.trend.each do |row| %><tr><td class="whitespace-nowrap font-medium text-ink"><%= l(row[:month], format: "%b %Y") %></td><td class="w-56"><div class="space-y-1"><div class="h-1.5 overflow-hidden rounded-full bg-surface-muted"><progress class="progress-bar" value="<%= ((row[:revenue] / max_total) * 100).round %>" max="100" aria-hidden="true"></progress></div><div class="h-1.5 overflow-hidden rounded-full bg-surface-muted"><progress class="progress-bar progress-gold" value="<%= ((row[:expenses] / max_total) * 100).round %>" max="100" aria-hidden="true"></progress></div></div></td><td class="tabular whitespace-nowrap text-right font-semibold text-ink"><%= money(row[:revenue], @report.currency) %></td><td class="tabular whitespace-nowrap text-right text-ink-muted"><%= money(row[:expenses], @report.currency) %></td><td class="tabular whitespace-nowrap text-right font-semibold <%= row[:profit].negative? ? 'text-[#b42318]' : 'text-[#067647]' %>"><%= money(row[:profit], @report.currency) %></td><td class="tabular text-right text-ink"><%= row[:orders] %></td></tr><% end %>
+  </tbody></table></div>
+  <div class="mt-4 space-y-2 lg:hidden"><% @report.trend.each do |row| %><article class="rounded-xl border border-line p-3.5"><div class="flex items-center justify-between"><p class="text-sm font-semibold text-ink"><%= l(row[:month], format: "%b %Y") %></p><span class="text-[11px] text-ink-muted"><%= t("reports.orders_count", count: row[:orders]) %></span></div><div class="mt-3 grid grid-cols-3 gap-2 text-[11px]"><div><p class="text-ink-muted"><%= t("reports.revenue") %></p><p class="mt-0.5 tabular font-semibold text-ink"><%= money(row[:revenue], @report.currency) %></p></div><div><p class="text-ink-muted"><%= t("reports.expenses") %></p><p class="mt-0.5 tabular font-medium text-ink"><%= money(row[:expenses], @report.currency) %></p></div><div class="text-right"><p class="text-ink-muted"><%= t("reports.net_profit") %></p><p class="mt-0.5 tabular font-semibold <%= row[:profit].negative? ? 'text-[#b42318]' : 'text-[#067647]' %>"><%= money(row[:profit], @report.currency) %></p></div></div></article><% end %></div>
+</section>
+
+  <div class="mt-4 grid gap-4 xl:grid-cols-2">
+    <section class="section-card" aria-labelledby="expense-breakdown-title"><h2 id="expense-breakdown-title" class="section-title"><%= t("reports.expense_breakdown") %></h2><p class="supporting-text"><%= t("reports.expense_breakdown_description") %></p><div class="mt-4 space-y-3">
+      <% if @report.expense_categories.any? %><% @report.expense_categories.each do |row| %><div><div class="flex items-center justify-between gap-3 text-xs"><span class="font-medium text-ink"><%= t("expenses.categories.#{row[:key]}") %></span><span class="tabular font-semibold text-ink"><%= money(row[:value], @report.currency) %> · <%= row[:percentage] %>%</span></div><div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-muted"><progress class="progress-bar progress-gold" value="<%= row[:percentage] %>" max="100" aria-hidden="true"></progress></div></div><% end %><% else %><p class="text-xs text-ink-muted"><%= t("reports.no_expense_data") %></p><% end %>
+    </div></section>
+    <section class="section-card" aria-labelledby="payment-breakdown-title"><h2 id="payment-breakdown-title" class="section-title"><%= t("reports.payment_breakdown") %></h2><p class="supporting-text"><%= t("reports.payment_breakdown_description") %></p><div class="mt-4 space-y-3">
+      <% if @report.payment_methods.any? %><% @report.payment_methods.each do |row| %><div><div class="flex items-center justify-between gap-3 text-xs"><span class="font-medium text-ink"><%= t("payments.methods.#{row[:key]}") %></span><span class="tabular font-semibold text-ink"><%= money(row[:value], @report.currency) %> · <%= row[:percentage] %>%</span></div><div class="mt-1.5 h-1.5 overflow-hidden rounded-full bg-surface-muted"><progress class="progress-bar" value="<%= row[:percentage] %>" max="100" aria-hidden="true"></progress></div></div><% end %><% else %><p class="text-xs text-ink-muted"><%= t("reports.no_payment_data") %></p><% end %>
+    </div></section>
+  </div>
+
+  <section class="section-card mt-4" aria-labelledby="staff-performance-title"><div><h2 id="staff-performance-title" class="section-title"><%= t("reports.staff_performance") %></h2><p class="supporting-text"><%= t("reports.staff_performance_description") %></p></div>
+    <% if @report.staff_performance.any? %>
+      <div class="table-shell mt-4 hidden md:block"><table class="data-table"><thead><tr><th><%= t("reports.staff_member") %></th><th class="text-right"><%= t("reports.completed_tasks") %></th><th class="text-right"><%= t("reports.active_tasks") %></th><th class="text-right"><%= t("reports.attendance_hours") %></th></tr></thead><tbody><% @report.staff_performance.each do |row| %><tr><td><div class="flex items-center gap-2.5"><%= render "shared/avatar", name: row[:staff].name, size: "sm" %><div class="min-w-0"><p class="truncate font-medium text-ink"><%= row[:staff].name %></p><p class="text-[11px] text-ink-muted"><%= row[:role].humanize %></p></div></div></td><td class="tabular text-right font-semibold text-ink"><%= row[:completed] %></td><td class="tabular text-right text-ink"><%= row[:active] %></td><td class="tabular text-right text-ink"><%= number_with_precision(row[:hours], precision: 2) %></td></tr><% end %></tbody></table></div>
+      <div class="mt-4 space-y-2 md:hidden"><% @report.staff_performance.each do |row| %><article class="rounded-xl border border-line p-3.5"><div class="flex items-center gap-2.5"><%= render "shared/avatar", name: row[:staff].name, size: "sm" %><div class="min-w-0"><p class="truncate text-sm font-semibold text-ink"><%= row[:staff].name %></p><p class="text-[11px] text-ink-muted"><%= row[:role].humanize %></p></div></div><div class="mt-3 grid grid-cols-3 gap-px overflow-hidden rounded-lg border border-line bg-line text-center"><div class="bg-surface px-2 py-2"><p class="text-[10px] text-ink-muted"><%= t("reports.completed_tasks") %></p><p class="mt-0.5 tabular text-sm font-semibold text-ink"><%= row[:completed] %></p></div><div class="bg-surface px-2 py-2"><p class="text-[10px] text-ink-muted"><%= t("reports.active_tasks") %></p><p class="mt-0.5 tabular text-sm font-semibold text-ink"><%= row[:active] %></p></div><div class="bg-surface px-2 py-2"><p class="text-[10px] text-ink-muted"><%= t("reports.attendance_hours") %></p><p class="mt-0.5 tabular text-sm font-semibold text-ink"><%= number_with_precision(row[:hours], precision: 2) %></p></div></div></article><% end %></div>
+    <% else %><div class="mt-4"><%= render "shared/empty_state", title: t("reports.no_staff_data"), description: t("reports.no_staff_data_description"), icon: "staff" %></div><% end %>
+  </section>

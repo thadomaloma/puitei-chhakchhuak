@@ -1,0 +1,3 @@
+<% content_for :title, t("designs.edit_title", title: @design.title) %>
+<%= render "shared/back_link", path: design_path(@design), label: @design.title %>
+<div class="mx-auto mt-3 max-w-6xl"><%= render "shared/page_header", eyebrow: @design.garment_type.humanize, title: t("designs.edit"), description: t("designs.edit_description") %><div class="mt-5"><%= render "form", design: @design %></div></div>

@@ -1,0 +1,5 @@
+<%= t("saas.invitation_email_title", shop: @invitation.shop.name) %>
+
+<%= t("saas.invitation_email_body", inviter: @invitation.invited_by.name, shop: @invitation.shop.name, role: @invitation.role.humanize, expires: l(@invitation.expires_at.to_date)) %>
+
+<%= @accept_url %>

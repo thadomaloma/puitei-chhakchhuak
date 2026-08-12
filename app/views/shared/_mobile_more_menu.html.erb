@@ -1,0 +1,29 @@
+<div id="mobile-more-menu" class="fixed inset-0 z-50 hidden" data-mobile-menu-target="panel" aria-hidden="true">
+  <button type="button" class="absolute inset-0 bg-brand/30 backdrop-blur-[2px]" data-action="mobile-menu#close" aria-label="<%= t('forms.cancel') %>"></button>
+  <section role="dialog" aria-modal="true" aria-labelledby="mobile-more-title" class="safe-bottom absolute inset-x-0 bottom-0 max-h-[82dvh] overflow-y-auto rounded-t-2xl border-t border-line bg-surface p-4 shadow-overlay">
+    <div class="mx-auto mb-3 h-1 w-9 rounded-full bg-line" aria-hidden="true"></div>
+    <div class="flex items-center justify-between">
+      <div><h2 id="mobile-more-title" class="text-lg font-semibold tracking-tight text-ink"><%= t("navigation.more") %></h2><p class="text-xs text-ink-muted"><%= t("app.name") %> · <%= current_branch.name %></p></div>
+      <button type="button" class="button-ghost button-icon" data-mobile-menu-target="close" data-action="mobile-menu#close" aria-label="<%= t('forms.cancel') %>"><%= ui_icon("x", size: 19) %></button>
+    </div>
+    <div class="mt-4 overflow-hidden rounded-xl border border-line">
+      <% links = [] %>
+      <% links << [t("navigation.measurements"), measurements_path, "ruler"] if policy(MeasurementProfile).index? %>
+      <% links << [t("navigation.designs"), designs_path, "designs"] if policy(Design).index? %>
+      <% links << [t("navigation.production"), production_path, "production"] %>
+      <% links << [t("navigation.deliveries"), deliveries_path, "delivery"] if policy(Delivery).index? %>
+      <% links << [t("navigation.inventory"), inventory_items_path, "inventory"] if policy(InventoryItem).index? %>
+      <% links << [t("navigation.expenses"), expenses_path, "expenses"] if policy(Expense).index? %>
+      <% links << [t("navigation.staff"), staff_index_path, "staff"] if policy(User).index? %>
+      <% links << [t("navigation.reports"), reports_path, "reports"] if policy(:report).index? %>
+      <% links << [t("navigation.shop_settings"), onboarding_path, "settings"] if policy(current_shop).update? %>
+      <% links << [t("navigation.payment_settings"), payment_setting_path, "payments"] if policy(current_branch.shop_setting).show? %>
+      <% links.each_with_index do |(label, path, icon), index| %>
+        <%= link_to path, class: "flex min-h-14 items-center gap-3 #{'border-b border-line' unless index == links.length - 1} px-3.5 text-sm font-semibold text-ink hover:bg-surface-muted", data: { action: "mobile-menu#close" } do %>
+          <span class="grid size-8 place-items-center rounded-lg bg-surface-muted text-emerald-refined"><%= ui_icon(icon, size: 17) %></span><span class="flex-1"><%= label %></span><%= ui_icon("chevron-right", size: 15, class_name: "text-ink-muted") %>
+        <% end %>
+      <% end %>
+    </div>
+    <%= button_to destroy_user_session_path, method: :delete, class: "button-ghost mt-4 w-full justify-start text-[#b42318]" do %><%= ui_icon("logout", size: 17) %><%= t("sessions.sign_out") %><% end %>
+  </section>
+</div>

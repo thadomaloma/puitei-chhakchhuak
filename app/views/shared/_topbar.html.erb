@@ -1,0 +1,54 @@
+<header class="safe-top sticky top-0 z-30 border-b border-line bg-surface/90 backdrop-blur-xl">
+  <div class="flex min-h-14 items-center justify-between gap-4 px-4 sm:px-6 lg:px-6 xl:px-8">
+    <div class="lg:hidden"><%= render "shared/brand" %></div>
+    <div class="hidden min-w-0 lg:block"><p class="truncate text-[15px] font-semibold leading-5 text-ink"><%= current_section_title %></p><p class="text-[11px] leading-4 text-ink-muted"><%= l(Date.current, format: :long) %></p></div>
+    <div class="flex shrink-0 items-center gap-1">
+    <% unread_count = unread_notification_count %>
+    <details class="relative shrink-0" data-controller="popover" data-action="toggle->popover#keepOneOpen click@window->popover#closeOnOutside keydown.esc@window->popover#closeOnEscape">
+      <summary class="relative flex size-9 cursor-pointer list-none items-center justify-center rounded-full border border-transparent transition hover:border-line hover:bg-surface-muted focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand" aria-label="<%= t('notifications.title') %>">
+        <%= ui_icon("notifications", size: 18, class_name: "text-ink-muted") %>
+        <% if unread_count.positive? %><span class="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#b42318] px-1 text-[9px] font-bold leading-none text-white"><%= unread_count > 9 ? "9+" : unread_count %></span><% end %>
+      </summary>
+      <div class="filter-popover right-0 w-80 p-2">
+        <div class="flex items-center justify-between px-3 py-2">
+          <p class="text-xs font-semibold text-ink"><%= t("notifications.title") %></p>
+          <% if unread_count.positive? %><%= button_to t("notifications.mark_all_read"), read_all_notifications_path, method: :patch, class: "text-[11px] font-semibold text-brand hover:underline", form: { class: "inline" } %><% end %>
+        </div>
+        <div class="my-1 border-t border-line"></div>
+        <% recent = recent_notifications %>
+        <% if recent.any? %>
+          <div class="max-h-80 overflow-y-auto">
+            <% recent.each do |notification| %>
+              <%= button_to read_notification_path(notification), method: :patch, class: "block w-full rounded-lg px-3 py-2 text-left hover:bg-surface-muted #{'opacity-60' if notification.read?}" do %>
+                <p class="truncate text-xs font-semibold text-ink"><%= notification.title %></p>
+                <p class="mt-0.5 truncate text-[11px] text-ink-muted"><%= notification.message %></p>
+              <% end %>
+            <% end %>
+          </div>
+          <div class="my-1 border-t border-line"></div>
+          <%= link_to t("notifications.view_all"), notifications_path, class: "block rounded-lg px-3 py-2 text-center text-xs font-semibold text-brand hover:bg-surface-muted" %>
+        <% else %>
+          <p class="px-3 py-4 text-center text-xs text-ink-muted"><%= t("notifications.empty") %></p>
+        <% end %>
+      </div>
+    </details>
+    <details class="relative shrink-0" data-controller="popover" data-action="toggle->popover#keepOneOpen click@window->popover#closeOnOutside keydown.esc@window->popover#closeOnEscape">
+      <summary class="flex cursor-pointer list-none items-center gap-2 rounded-full border border-transparent py-1 pl-1 pr-1 transition hover:border-line hover:bg-surface-muted sm:pr-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand" aria-label="<%= current_user.name %>">
+        <%= render "shared/avatar", name: current_user.name, size: "sm" %>
+        <span class="hidden min-w-0 flex-col items-start sm:flex">
+          <span class="truncate text-[12px] font-semibold leading-4 text-ink"><%= current_user.name %></span>
+          <span class="truncate text-[10px] leading-4 text-ink-muted"><%= current_membership.role.humanize %></span>
+        </span>
+        <%= ui_icon("chevron-down", size: 14, class_name: "hidden shrink-0 text-ink-muted sm:block") %>
+      </summary>
+      <div class="filter-popover right-0 w-56 p-2">
+        <div class="px-3 py-2"><p class="truncate text-xs font-semibold text-ink"><%= current_user.name %></p><p class="text-[11px] text-ink-muted"><%= current_membership.role.humanize %></p></div>
+        <div class="my-1 border-t border-line"></div>
+        <% if policy(current_shop).update? %><%= link_to t("navigation.shop_settings"), onboarding_path, class: "block rounded-lg px-3 py-2 text-xs font-semibold text-ink hover:bg-surface-muted" %><% end %>
+        <% if policy(current_branch.shop_setting).show? %><%= link_to t("navigation.payment_settings"), payment_setting_path, class: "block rounded-lg px-3 py-2 text-xs font-semibold text-ink hover:bg-surface-muted" %><% end %>
+        <%= button_to t("sessions.sign_out"), destroy_user_session_path, method: :delete, class: "block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-[#b42318] hover:bg-[#fff5f4]" %>
+      </div>
+    </details>
+    </div>
+  </div>
+</header>

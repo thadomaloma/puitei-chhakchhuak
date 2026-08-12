@@ -1,0 +1,20 @@
+alice_blouse_v1:
+  shop: primary
+  measurement_profile: alice_blouse
+  created_by: receptionist
+  version: 1
+  measured_on: <%= Date.current - 30.days %>
+  values:
+    bust: "36.0"
+    waist: "30.0"
+    sleeve_length: "16.0"
+  notes: First version
+
+other_shirt_v1:
+  shop: primary
+  measurement_profile: other_shirt
+  created_by: second_manager
+  version: 1
+  measured_on: <%= Date.current %>
+  values:
+    chest: "100.0"

@@ -1,0 +1,18 @@
+<% content_for :title, t("work_shifts.index_title") %>
+<%= render "shared/page_header", eyebrow: t("staff.eyebrow"), title: t("work_shifts.title"), description: t("work_shifts.description"), action: (link_to(ui_icon("plus", size: 17) + t("work_shifts.new"), new_work_shift_path, class: "button-primary") if policy(WorkShift.new(branch: current_branch)).create?), secondary_action: (link_to(t("staff.directory"), staff_index_path, class: "button-secondary") if policy(User).index?) %>
+<% if @staff_options %><%= form_with url: work_shifts_path, method: :get, class: "toolbar mt-4 flex gap-2" do |form| %><%= form.select :user_id, @staff_options.map { |member| [ member.name, member.id ] }, { include_blank: t("staff.all_staff"), selected: params[:user_id] }, class: "form-select mt-0 min-w-0 flex-1", aria: { label: t("staff.staff_member") } %><%= form.submit t("forms.search"), class: "button-secondary" %><% end %><% end %>
+
+<% if @work_shifts.any? %>
+  <div class="mt-4 space-y-2">
+    <% @work_shifts.each do |shift| %>
+      <article class="card min-w-0 p-4 <%= 'opacity-65' if shift.cancelled? %>">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="flex min-w-0 gap-3"><div class="grid size-10 shrink-0 place-items-center rounded-lg bg-surface-muted text-emerald-refined"><%= ui_icon("calendar", size: 18) %></div><div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><h2 class="truncate text-sm font-semibold text-ink"><%= shift.user.name %></h2><% if shift.cancelled? %><%= status_badge("cancelled", label: t("work_shifts.cancelled_label"), variant: "danger") %><% end %></div><p class="mt-1 text-xs font-semibold text-ink"><%= l(shift.starts_at, format: :long) %></p><p class="mt-0.5 text-xs text-ink-muted"><%= l(shift.starts_at, format: :short) %> → <%= l(shift.ends_at, format: :short) %></p><p class="mt-1 text-[11px] text-ink-muted"><%= shift.location.presence || shift.branch.name %><% if shift.notes.present? %> · <%= shift.notes %><% end %></p></div></div>
+          <div class="shrink-0 sm:text-right"><p class="text-[10px] text-ink-muted"><%= t("work_shifts.scheduled_by", name: shift.created_by.name) %></p><% if policy(shift).cancel? %><%= form_with url: cancel_work_shift_path(shift), method: :patch, class: "mt-2 flex gap-2" do |form| %><%= form.label :cancel_reason, t("work_shifts.cancel_reason"), class: "sr-only" %><%= form.text_field :cancel_reason, name: "work_shift[cancel_reason]", class: "form-input mt-0 min-w-0", placeholder: t("work_shifts.cancel_reason"), required: true %><%= form.submit t("work_shifts.cancel"), class: "button-danger shrink-0" %><% end %><% elsif shift.cancelled? %><p class="mt-1 text-[10px] text-[#b42318]"><%= shift.cancel_reason %></p><% end %></div>
+        </div>
+      </article>
+    <% end %>
+  </div>
+<% else %>
+  <div class="mt-4"><%= render "shared/empty_state", title: t("work_shifts.empty"), description: t("work_shifts.empty_description"), icon: "calendar" %></div>
+<% end %>

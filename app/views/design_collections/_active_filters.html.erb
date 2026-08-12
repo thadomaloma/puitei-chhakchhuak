@@ -1,0 +1,16 @@
+<% if active_filters.any? %>
+  <section class="mt-3 min-w-0" aria-labelledby="active-collection-filters-heading" data-testid="active-collection-filters">
+    <h2 id="active-collection-filters-heading" class="sr-only"><%= label %></h2>
+    <ul class="flex min-w-0 flex-wrap items-center gap-2 text-xs">
+      <% active_filters.each do |filter| %>
+        <li class="min-w-0 max-w-full">
+          <%= render "design_collections/filter_chip", filter: filter %>
+        </li>
+      <% end %>
+    </ul>
+    <%= link_to t("design_collections.clear_all"), clear_all_path,
+      class: "button-ghost button-sm mt-2",
+      aria: { label: t("design_collections.clear_all_filters") },
+      data: { testid: "clear-all-collection-filters" } %>
+  </section>
+<% end %>

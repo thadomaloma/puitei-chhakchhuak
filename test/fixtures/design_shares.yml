@@ -1,0 +1,10 @@
+alice_preview:
+  shop: primary
+  customer: alice
+  created_by: manager
+  token_digest: <%= Digest::SHA256.hexdigest("alice-preview-token") %>
+  token_hint: token
+  expires_at: <%= 7.days.from_now %>
+  allow_feedback: true
+  title: Alice's private shortlist
+  message: Please review these references.

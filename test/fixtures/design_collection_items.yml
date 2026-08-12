@@ -1,0 +1,13 @@
+bridal_blouse:
+  shop: primary
+  design_collection: bridal
+  design: blouse_reference
+  added_by: manager
+  position: 1
+
+foreign_item:
+  shop: foreign
+  design_collection: foreign_collection
+  design: foreign_reference
+  added_by: manager
+  position: 1

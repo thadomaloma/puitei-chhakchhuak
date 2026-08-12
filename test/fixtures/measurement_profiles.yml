@@ -1,0 +1,16 @@
+alice_blouse:
+  shop: primary
+  customer: alice
+  measurement_template: blouse
+  name: Everyday blouse
+  unit: inches
+  fitting_notes: Comfortable fit
+  active: true
+
+other_shirt:
+  shop: primary
+  customer: other_branch
+  measurement_template: shirt
+  name: Office shirt
+  unit: centimetres
+  active: true

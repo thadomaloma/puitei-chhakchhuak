@@ -1,0 +1,4 @@
+<% content_for :title, t("inventory.edit") %>
+<%= render "shared/back_link", path: inventory_item_path(@inventory_item), label: @inventory_item.name %>
+<div class="mx-auto mt-3 max-w-4xl"><%= render "shared/page_header", eyebrow: @inventory_item.sku, title: t("inventory.edit"), description: t("inventory.edit_description") %></div>
+<div class="mt-5"><%= render "form", inventory_item: @inventory_item %></div>

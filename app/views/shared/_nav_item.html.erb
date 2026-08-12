@@ -1,0 +1,11 @@
+<% active ||= false %>
+<% disabled ||= false %>
+<% if disabled %>
+  <span class="flex min-h-10 items-center gap-2.5 rounded-lg px-2.5 text-[13px] font-medium text-ink-muted/55" title="<%= t('navigation.future_phase') %>">
+    <%= ui_icon(icon, size: 19) %><span class="flex-1"><%= label %></span><span class="rounded-md bg-surface-muted px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider"><%= t("navigation.soon") %></span>
+  </span>
+<% else %>
+  <%= link_to path, class: "relative flex min-h-10 items-center gap-2.5 rounded-lg px-2.5 text-[13px] font-medium transition duration-150 #{active ? 'bg-brand text-white shadow-sm' : 'text-ink-muted hover:bg-surface-muted hover:text-ink'}", aria: (active ? { current: "page" } : {}) do %>
+    <%= ui_icon(icon, size: 17) %><span class="flex-1"><%= label %></span>
+  <% end %>
+<% end %>

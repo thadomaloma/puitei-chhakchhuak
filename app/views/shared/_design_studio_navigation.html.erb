@@ -1,0 +1,10 @@
+<nav class="mt-5 overflow-x-auto" aria-label="<%= t('design_collections.studio_navigation') %>">
+  <div class="segmented-control w-max">
+    <% all_designs_active = controller_name == "designs" && params[:favourites] != "1" %>
+    <% favourites_active = controller_name == "designs" && params[:favourites] == "1" %>
+    <%= link_to t("design_collections.all_designs"), designs_path, class: "segmented-item #{all_designs_active ? 'segmented-item-active' : ''}", aria: (all_designs_active ? { current: "page" } : {}) %>
+    <%= link_to t("design_favourites.title"), designs_path(favourites: 1), class: "segmented-item #{favourites_active ? 'segmented-item-active' : ''}", aria: (favourites_active ? { current: "page" } : {}) %>
+    <%= link_to t("design_collections.collections"), design_collections_path, class: "segmented-item #{controller_name.in?(%w[design_collections design_collection_items]) ? 'segmented-item-active' : ''}", aria: (controller_name.in?(%w[design_collections design_collection_items]) ? { current: "page" } : {}) %>
+    <% if policy(DesignShare).index? %><%= link_to t("design_shares.title"), design_shares_path, class: "segmented-item #{controller_name == 'design_shares' ? 'segmented-item-active' : ''}", aria: (controller_name == "design_shares" ? { current: "page" } : {}) %><% end %>
+  </div>
+</nav>

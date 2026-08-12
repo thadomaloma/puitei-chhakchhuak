@@ -1,0 +1,9 @@
+<div>
+  <%= form.label :category, t("inventory.category"), for: "inventory_category_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.select :category, options_for_select([[t("inventory.all_categories"), ""]] + InventoryItem.categories.keys.map { |category| [t("inventory.categories.#{category}"), category] }, params[:category]), {}, id: "inventory_category_#{suffix}", class: "form-input mt-0" %>
+</div>
+<div>
+  <%= form.label :stock, t("inventory.stock"), for: "inventory_stock_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.select :stock, options_for_select([[t("inventory.all_stock"), ""], [t("inventory.stock_statuses.in_stock"), "available"], [t("inventory.stock_statuses.low_stock"), "low"], [t("inventory.stock_statuses.out_of_stock"), "out"], [t("inventory.reserved_items"), "reserved"]], params[:stock]), {}, id: "inventory_stock_#{suffix}", class: "form-input mt-0" %>
+</div>
+<label class="flex min-h-11 items-center gap-2 rounded-xl border border-line bg-surface px-3 text-xs font-medium text-ink-muted"><%= form.check_box :archived, { checked: params[:archived] == "1", class: "size-4 rounded border-line text-brand", id: "inventory_archived_#{suffix}" }, "1", "0" %><%= t("inventory.include_archived") %></label>

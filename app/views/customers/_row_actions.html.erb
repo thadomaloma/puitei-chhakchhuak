@@ -1,0 +1,10 @@
+<details class="relative inline-block text-left">
+  <summary class="button-ghost button-icon button-sm list-none" aria-label="<%= t('customers.actions_for', name: customer.full_name) %>"><%= ui_icon("more", size: 17) %></summary>
+  <div class="absolute right-0 z-20 mt-1 w-48 overflow-hidden rounded-xl border border-line bg-surface p-1.5 text-left shadow-overlay">
+    <%= link_to t("forms.view"), customer_path(customer), class: "button-ghost button-sm w-full justify-start", data: { turbo_frame: "_top" } %>
+    <% if policy(customer).update? %><%= link_to t("forms.edit"), edit_customer_path(customer), class: "button-ghost button-sm w-full justify-start", data: { turbo_frame: "_top" } %><% end %>
+    <% if customer.active? && policy(MeasurementProfile.new(customer: customer)).create? %><%= link_to t("customers.new_measurement"), new_customer_measurement_profile_path(customer), class: "button-ghost button-sm w-full justify-start", data: { turbo_frame: "_top" } %><% end %>
+    <% if customer.active? && policy(Order).create? %><%= link_to t("orders.new"), new_order_path(customer_id: customer.id), class: "button-ghost button-sm w-full justify-start", data: { turbo_frame: "_top" } %><% end %>
+    <% if customer.active? && policy(customer).destroy? %><div class="my-1 border-t border-line"></div><%= button_to t("customers.archive"), customer_path(customer), method: :delete, class: "button-ghost button-sm w-full justify-start text-[#b42318]", form: { data: { turbo_confirm: t("customers.archive_confirm"), turbo_frame: "_top" } } %><% end %>
+  </div>
+</details>

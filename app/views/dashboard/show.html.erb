@@ -1,0 +1,101 @@
+<% content_for :title, t("dashboard.title") %>
+
+<%= render "shared/page_header",
+  eyebrow: l(Date.current, format: :long),
+  title: t("dashboard.greeting", greeting: time_greeting, name: current_user.name.split.first),
+  description: t("dashboard.subtitle", branch: @branch.name),
+  action: (link_to(ui_icon("plus", size: 17) + t("orders.new"), new_order_path, class: "button-primary hidden sm:inline-flex") if policy(Order).create?) %>
+
+<section class="mt-5 space-y-3" aria-label="<%= t('dashboard.key_metrics') %>" data-dashboard-metrics>
+  <div>
+    <p class="px-0.5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted/70"><%= t("dashboard.today_group") %></p>
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <%= render "shared/stat_card", label: t("dashboard.orders_today"), value: @orders_today_count, detail: t("dashboard.placed_today"), icon: "orders", tone: "neutral", href: orders_path %>
+      <%= render "shared/stat_card", label: t("dashboard.due_today"), value: @due_today_count, detail: t("dashboard.delivery_commitments"), icon: "calendar", tone: (@due_today_count.positive? ? "warning" : "neutral"), href: orders_path %>
+      <%= render "shared/stat_card", label: t("dashboard.ready_collection"), value: @ready_count, detail: t("dashboard.production_complete"), icon: "check", tone: "success", href: production_path %>
+    </div>
+  </div>
+  <div>
+    <p class="px-0.5 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-muted/70"><%= t("dashboard.money_group") %></p>
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-3">
+      <%= render "shared/stat_card", label: t("dashboard.outstanding_balance"), value: (@financial_access ? money(@outstanding_balance, @shop_setting.currency) : "—"), detail: (@financial_access ? t("dashboard.confirmed_balances") : t("dashboard.restricted_metric")), icon: "payments", tone: "warning", href: (@financial_access ? payments_path : nil) %>
+      <%= render "shared/stat_card", label: t("dashboard.monthly_revenue"), value: (@financial_access ? money(@monthly_revenue, @shop_setting.currency) : "—"), detail: (@financial_access ? t("dashboard.active_receipts_month") : t("dashboard.restricted_metric")), icon: "reports", tone: "premium", href: (@financial_access ? payments_path : nil) %>
+      <%= render "shared/stat_card", label: t("dashboard.monthly_profit"), value: (@financial_access && @expense_access ? money(@monthly_profit, @shop_setting.currency) : "—"), detail: (@financial_access && @expense_access ? t("dashboard.revenue_less_expenses", expenses: money(@monthly_expenses, @shop_setting.currency)) : t("dashboard.restricted_metric")), icon: "sparkles", tone: (@financial_access && @expense_access ? (@monthly_profit.negative? ? "danger" : "success") : "neutral"), href: (@expense_access ? expenses_path : nil) %>
+    </div>
+  </div>
+</section>
+
+<section class="toolbar mt-4" aria-labelledby="quick-actions-title">
+  <div class="flex flex-col gap-2.5 sm:flex-row sm:items-center">
+    <h2 id="quick-actions-title" class="text-xs font-semibold text-ink sm:mr-2"><%= t("dashboard.quick_actions") %></h2>
+    <div class="grid flex-1 grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+      <% if policy(Customer).create? %><%= link_to new_customer_path, class: "button-secondary button-sm justify-start" do %><span class="text-emerald-refined"><%= ui_icon("customers", size: 15) %></span><%= t("customers.new") %><% end %><% end %>
+      <%= link_to production_path, class: "button-secondary button-sm justify-start" do %><span class="text-emerald-refined"><%= ui_icon("production", size: 15) %></span><%= t("dashboard.work_queue") %><% end %>
+      <% if @financial_access %><%= link_to payments_path, class: "button-secondary button-sm justify-start" do %><span class="text-emerald-refined"><%= ui_icon("payments", size: 15) %></span><%= t("dashboard.receive_payment") %><% end %><% end %>
+      <% if @expense_access %><%= link_to new_expense_path, class: "button-secondary button-sm justify-start" do %><span class="text-emerald-refined"><%= ui_icon("expenses", size: 15) %></span><%= t("dashboard.record_expense") %><% end %><% end %>
+      <%= link_to inventory_items_path(stock: (@low_stock_count.positive? ? "low" : nil)), class: "button-secondary button-sm justify-start" do %><span class="text-emerald-refined"><%= ui_icon("inventory", size: 15) %></span><%= t("inventory.title") %><% if @low_stock_count.positive? %><span class="ml-auto rounded-md bg-[#fff4e5] px-1.5 py-0.5 text-[10px] font-semibold text-[#93370d]"><%= @low_stock_count %></span><% end %><% end %>
+      <% if @delivery_access %><%= link_to deliveries_path, class: "button-secondary button-sm justify-start" do %><span class="text-emerald-refined"><%= ui_icon("delivery", size: 15) %></span><%= t("deliveries.desk") %><% if @ready_count.positive? %><span class="ml-auto rounded-md bg-[#ecfdf3] px-1.5 py-0.5 text-[10px] font-semibold text-[#067647]"><%= @ready_count %></span><% end %><% end %><% end %>
+    </div>
+  </div>
+</section>
+
+<div class="mt-5 grid items-start gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(20rem,0.72fr)]">
+<div class="order-2 min-w-0 space-y-5 xl:order-1">
+<section aria-labelledby="recent-orders-title">
+  <div class="mb-2.5 flex items-center justify-between gap-3">
+    <div><h2 id="recent-orders-title" class="section-title"><%= t("dashboard.recent_orders") %></h2><p class="supporting-text"><%= t("dashboard.recent_orders_description") %></p></div>
+    <%= link_to orders_path, class: "button-ghost button-sm shrink-0" do %><%= t("dashboard.view_all") %><%= ui_icon("arrow-right", size: 14) %><% end %>
+  </div>
+
+  <% if @recent_orders.any? %>
+    <div class="table-shell hidden 2xl:block">
+      <table class="data-table">
+        <thead><tr><th><%= t("dashboard.order") %></th><th><%= t("customers.customer") %></th><th><%= t("orders.items") %></th><th><%= t("orders.status") %></th><th><%= t("orders.delivery") %></th><% if @financial_access %><th class="text-right"><%= t("payments.balance") %></th><% end %><th><span class="sr-only"><%= t("forms.actions") %></span></th></tr></thead>
+        <tbody>
+          <% @recent_orders.each do |order| %>
+            <tr>
+              <td><%= link_to order.order_number, order, class: "font-mono text-xs font-semibold text-brand" %></td>
+              <td><p class="font-medium text-ink"><%= order.customer.full_name %></p><p class="text-[11px] text-ink-muted"><%= order.customer.phone_number %></p></td>
+              <td class="text-ink-muted"><%= t("orders.garments", count: order.order_items.sum(&:quantity)) %></td>
+              <td><%= order_status_badge(order) %></td>
+              <td class="whitespace-nowrap"><p class="tabular font-medium text-ink"><%= l(order.delivery_date) %></p><% if order.trial_date %><p class="text-[11px] text-ink-muted"><%= t("dashboard.trial", date: l(order.trial_date)) %></p><% end %></td>
+              <% if @financial_access %><td class="tabular whitespace-nowrap text-right font-semibold text-ink"><%= money(order.balance_due, order.currency) %></td><% end %>
+              <td class="text-right"><%= link_to order, class: "button-ghost button-icon button-sm", aria: { label: t("forms.view") } do %><%= ui_icon("chevron-right", size: 16) %><% end %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid gap-2 md:grid-cols-2 2xl:hidden">
+      <% @recent_orders.each do |order| %>
+        <%= link_to order, class: "card block p-3.5 transition-colors hover:bg-surface-muted/35" do %>
+          <div class="flex items-start justify-between gap-3"><div class="min-w-0"><p class="truncate font-mono text-[11px] font-semibold text-brand"><%= order.order_number %></p><h3 class="mt-0.5 truncate text-sm font-semibold text-ink"><%= order.customer.full_name %></h3></div><%= order_status_badge(order) %></div>
+          <div class="mt-2.5 grid grid-cols-3 gap-2 border-t border-line pt-2.5 text-[11px]">
+            <div><p class="text-ink-muted"><%= t("orders.items") %></p><p class="mt-0.5 font-medium text-ink"><%= t("orders.garments", count: order.order_items.sum(&:quantity)) %></p></div>
+            <div><p class="text-ink-muted"><%= t("orders.delivery") %></p><p class="mt-0.5 tabular font-medium text-ink"><%= l(order.delivery_date) %></p></div>
+            <% if @financial_access %><div class="text-right"><p class="text-ink-muted"><%= t("payments.balance") %></p><p class="mt-0.5 tabular font-semibold text-ink"><%= money(order.balance_due, order.currency) %></p></div><% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <%= render "shared/empty_state", title: t("dashboard.no_orders"), description: t("dashboard.no_orders_description"), icon: "orders", action: (link_to(t("orders.new"), new_order_path, class: "button-primary") if policy(Order).create?) %>
+  <% end %>
+</section>
+
+  <section class="section-card" aria-labelledby="production-progress-title">
+    <div class="flex items-center justify-between gap-3"><div><h2 id="production-progress-title" class="section-title"><%= t("dashboard.production_progress") %></h2><p class="supporting-text"><%= t("dashboard.production_progress_description") %></p></div><%= link_to production_path, class: "button-ghost button-sm shrink-0" do %><%= t("dashboard.open_board") %><%= ui_icon("arrow-right", size: 14) %><% end %></div>
+    <div class="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
+      <% @production_stages.each do |stage| %>
+        <div class="bg-surface p-3"><div class="flex items-center justify-between"><span class="text-ink-muted"><%= ui_icon(stage[:icon], size: 15) %></span><span class="tabular text-base font-semibold text-ink"><%= stage[:count] %></span></div><p class="mt-2 text-[11px] font-medium text-ink-muted"><%= t("dashboard.production_stages.#{stage[:key]}") %></p></div>
+      <% end %>
+    </div>
+  </section>
+</div>
+
+  <aside class="order-1 space-y-4 xl:order-2">
+    <%= render "today_priorities" %>
+    <%= render "team_capacity" %>
+  </aside>
+</div>

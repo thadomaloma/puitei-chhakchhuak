@@ -1,0 +1,39 @@
+<% content_for :title, @expense.expense_number %>
+
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <%= render "shared/back_link", path: expenses_path, label: t("expenses.dashboard") %>
+  <%= link_to t("expenses.print_voucher"), voucher_expense_path(@expense), class: "button-primary" %>
+</div>
+
+<section class="section-card mx-auto mt-4 max-w-3xl">
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+    <div class="min-w-0"><div class="flex flex-wrap items-center gap-2"><p class="eyebrow"><%= t("expenses.expense_voucher") %></p><%= expense_status_badge(@expense) %></div><h1 class="mt-1 break-all font-mono text-lg font-semibold tracking-[-0.025em] text-ink sm:text-xl"><%= @expense.expense_number %></h1><p class="mt-1 text-xs text-ink-muted"><%= l(@expense.incurred_on, format: :long) %> · <%= t("expenses.categories.#{@expense.category}") %></p></div>
+    <div class="sm:text-right"><p class="tabular text-2xl font-semibold tracking-[-0.025em] <%= @expense.voided? ? 'text-ink-muted line-through' : 'text-ink' %>"><%= money(@expense.amount, @expense.currency) %></p><p class="mt-1 text-xs font-semibold text-ink-muted"><%= t("payments.methods.#{@expense.payment_method}") %></p></div>
+  </div>
+
+  <% if @expense.approval_pending? && !@expense.voided? %><div role="status" class="mt-4 rounded-lg border border-amber-200 bg-[#fff8eb] p-3 text-xs text-[#93370d]"><p class="font-semibold"><%= t("expenses.pending_notice") %></p><p class="mt-1"><%= t("expenses.pending_excluded") %></p></div><% end %>
+  <% if @expense.voided? %><div role="alert" class="mt-4 rounded-lg border border-red-200 bg-[#fef3f2] p-3 text-xs text-[#b42318]"><p class="font-semibold"><%= t("expenses.voided_notice") %></p><p class="mt-1"><%= @expense.void_reason %></p><p class="mt-1 text-[10px]"><%= @expense.voided_by.name %> · <%= l(@expense.voided_at, format: :short) %></p></div><% end %>
+
+  <div class="mt-5"><p class="detail-label"><%= t("expenses.description") %></p><p class="mt-1 text-base font-semibold text-ink"><%= @expense.description %></p></div>
+  <dl class="mt-5 grid gap-4 border-y border-line py-4 sm:grid-cols-2">
+    <div><dt class="detail-label"><%= t("expenses.vendor") %></dt><dd class="detail-value"><%= @expense.vendor.presence || "—" %></dd></div>
+    <div><dt class="detail-label"><%= t("expenses.reference") %></dt><dd class="detail-value"><%= @expense.reference_number.presence || "—" %></dd></div>
+    <div><dt class="detail-label"><%= t("expenses.recorded_by") %></dt><dd class="detail-value"><%= @expense.recorded_by.name %></dd><dd class="text-xs text-ink-muted"><%= l(@expense.created_at, format: :short) %></dd></div>
+    <div><dt class="detail-label"><%= t("expenses.approved_by") %></dt><dd class="detail-value"><%= @expense.approved_by&.name || t("expenses.awaiting_approval") %></dd><% if @expense.approved_at %><dd class="text-xs text-ink-muted"><%= l(@expense.approved_at, format: :short) %></dd><% end %></div>
+    <div><dt class="detail-label"><%= t("expenses.recurrence") %></dt><dd class="detail-value"><%= t("expenses.recurrences.#{@expense.recurrence_interval}") %></dd><% if @expense.next_due_on %><dd class="text-xs text-ink-muted"><%= t("expenses.next_due", date: l(@expense.next_due_on)) %></dd><% end %></div>
+    <div><dt class="detail-label"><%= t("customers.branch") %></dt><dd class="detail-value"><%= @expense.branch.name %></dd></div>
+  </dl>
+
+  <% if @expense.notes.present? %><div class="mt-4"><h2 class="detail-label"><%= t("customers.notes") %></h2><p class="mt-1 whitespace-pre-line text-sm leading-5 text-ink-muted"><%= @expense.notes %></p></div><% end %>
+
+  <% if @expense.receipts.attached? %><section class="mt-5 border-t border-line pt-4" aria-labelledby="receipt-files-title"><h2 id="receipt-files-title" class="detail-label"><%= t("expenses.receipts") %></h2><div class="mt-2 grid gap-2 sm:grid-cols-2"><% @expense.receipts.each do |receipt| %><%= link_to rails_blob_path(receipt, disposition: "attachment"), class: "flex min-w-0 items-center gap-3 rounded-lg border border-line p-3 hover:bg-surface-muted" do %><span class="grid size-9 shrink-0 place-items-center rounded-lg bg-surface-muted text-emerald-refined"><%= ui_icon("expenses", size: 17) %></span><span class="min-w-0"><span class="block truncate text-xs font-semibold text-ink"><%= receipt.filename %></span><span class="block text-[10px] text-ink-muted"><%= number_to_human_size(receipt.byte_size) %></span></span><% end %><% end %></div></section><% end %>
+
+  <% if @expense.source_expense || @expense.generated_expenses.any? %><section class="mt-5 rounded-lg bg-surface-muted/65 p-3"><h2 class="detail-label"><%= t("expenses.recurrence_history") %></h2><div class="mt-2 space-y-1 text-xs"><% if @expense.source_expense %><div class="flex items-center justify-between gap-3"><span class="text-ink-muted"><%= t("expenses.previous_occurrence") %></span><%= link_to @expense.source_expense.expense_number, @expense.source_expense, class: "font-mono font-semibold text-brand" %></div><% end %><% @expense.generated_expenses.order(:incurred_on).each do |generated| %><div class="flex items-center justify-between gap-3"><span class="text-ink-muted"><%= t("expenses.generated_occurrence", date: l(generated.incurred_on)) %></span><%= link_to generated.expense_number, generated, class: "font-mono font-semibold text-brand" %></div><% end %></div></section><% end %>
+
+  <div class="mt-5 flex flex-wrap gap-2 border-t border-line pt-4">
+    <% if policy(@expense).approve? %><%= button_to t("expenses.approve_action"), approve_expense_path(@expense), method: :patch, class: "button-primary", data: { turbo_confirm: t("expenses.approve_confirm") } %><% end %>
+    <% if policy(@expense).record_next? %><%= button_to t("expenses.record_next"), record_next_expense_path(@expense), method: :post, class: "button-secondary", data: { turbo_confirm: t("expenses.record_next_confirm", date: l(@expense.next_due_on)) } %><% end %>
+  </div>
+
+  <% if policy(@expense).void? %><%= form_with url: void_expense_path(@expense), method: :patch, class: "mt-4 flex flex-wrap items-end gap-2 border-t border-red-100 pt-4" do |form| %><div class="min-w-56 flex-1"><%= form.label :void_reason, t("expenses.void_reason"), class: "text-xs font-semibold text-[#b42318]" %><%= form.text_field :void_reason, name: "expense[void_reason]", class: "form-input", required: true %></div><%= form.submit t("expenses.void_action"), class: "button-danger", data: { turbo_confirm: t("expenses.void_confirm") } %><% end %><% end %>
+</section>

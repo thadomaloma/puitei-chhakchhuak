@@ -1,0 +1,20 @@
+<% total = order_display_total(order) %>
+<% paid = order.paid_amount %>
+<% balance = order.billable? ? order.balance_due : 0.to_d %>
+<tr>
+  <td>
+    <%= link_to order.order_number, order, class: "font-mono text-xs font-semibold text-brand hover:text-brand-hover" %>
+    <p class="mt-1 text-[11px] text-ink-muted"><%= t("orders.placed", date: l(order.ordered_on)) %></p>
+  </td>
+  <td>
+    <div class="flex items-center gap-2.5">
+      <%= render "customers/avatar", customer: order.customer, size: "small" %>
+      <div class="min-w-0"><%= link_to order.customer.full_name, order.customer, class: "block truncate text-sm font-semibold text-ink hover:text-emerald-refined" %><p class="truncate text-[11px] text-ink-muted"><%= order.customer.phone_number %> · <%= order.branch.code %></p></div>
+    </div>
+  </td>
+  <td><p class="text-sm font-medium text-ink"><%= t("orders.garments", count: order.order_items.sum(&:quantity)) %></p><p class="mt-1 text-[11px] text-ink-muted"><%= order.order_items.map(&:garment_name).first(2).join(" · ").presence || "—" %></p></td>
+  <td><p class="tabular text-sm font-semibold text-ink"><%= money(total, order.currency) %></p><p class="mt-1 text-[11px] text-ink-muted"><%= order.billable? ? t("orders.payment_summary", paid: money(paid, order.currency), balance: money(balance, order.currency)) : t("orders.estimated_total") %></p></td>
+  <td><p class="whitespace-nowrap text-sm font-medium text-ink"><%= l(order.delivery_date) %></p><p class="mt-1 text-[11px] <%= order_delivery_state(order) == 'overdue' ? 'font-semibold text-[#b42318]' : 'text-ink-muted' %>"><%= order_delivery_label(order) %></p></td>
+  <td><%= order_status_badge(order) %></td>
+  <td class="text-right"><%= link_to order, class: "button-ghost button-icon button-sm", aria: { label: t("orders.open_order", number: order.order_number) } do %><%= ui_icon("chevron-right", size: 15) %><% end %></td>
+</tr>

@@ -1,0 +1,8 @@
+<% flash.each do |type, message| %>
+  <% alert = type.to_s.in?(%w[alert error]) %>
+  <div class="pointer-events-none fixed inset-x-4 top-[calc(4.75rem+env(safe-area-inset-top))] z-[60] flex justify-end lg:left-auto lg:right-6 lg:top-5" role="<%= alert ? 'alert' : 'status' %>" aria-live="<%= alert ? 'assertive' : 'polite' %>" data-controller="flash" data-flash-auto-value="<%= !alert %>">
+    <div class="pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-xl border p-3.5 shadow-overlay <%= alert ? 'border-red-200 bg-[#fff9f8] text-[#8b3733]' : 'border-emerald-200 bg-[#f8fcfa] text-[#205d4c]' %>">
+      <span class="mt-0.5"><%= ui_icon(alert ? "warning" : "check", size: 18) %></span><p class="min-w-0 flex-1 text-sm font-medium leading-5"><%= message %></p><button type="button" class="-m-1 grid size-8 place-items-center rounded-lg opacity-70 hover:bg-black/5 hover:opacity-100" data-action="flash#dismiss" aria-label="<%= t('flash.dismiss') %>"><%= ui_icon("x", size: 16) %></button>
+    </div>
+  </div>
+<% end %>

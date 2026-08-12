@@ -1,0 +1,39 @@
+<% content_for :title, t("designs.index_title") %>
+<%= render "shared/page_header", eyebrow: t("designs.eyebrow"), title: t("designs.title"), description: t("designs.description", count: @design_count), action: (link_to(ui_icon("plus", size: 17) + t("designs.upload"), new_design_path, class: "button-primary") if policy(Design).create?) %>
+<%= render "shared/design_studio_navigation" %>
+
+<div class="mt-4 grid gap-3 sm:grid-cols-3">
+  <%= render "shared/stat_card", label: t("designs.active_designs"), value: @design_count, detail: t("designs.active_detail"), icon: "designs", tone: "info", href: designs_path %>
+  <%= render "shared/stat_card", label: t("designs.shareable"), value: @shareable_count, detail: t("designs.shareable_detail"), icon: "customers", tone: "warning", href: designs_path(visibility: "customer_shareable") %>
+  <%= render "shared/stat_card", label: t("designs.garment_families"), value: @garment_count, detail: t("designs.garment_detail"), icon: "ruler", tone: "success" %>
+</div>
+
+<%= render "desktop_filter_bar" %>
+<%= form_with url: designs_path, method: :get, class: "toolbar mt-5 xl:hidden", data: { controller: "mobile-menu", action: "keydown.esc@window->mobile-menu#close" } do |form| %>
+  <div class="relative min-w-0 flex-1"><span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-muted"><%= ui_icon("search", size: 16) %></span><%= form.search_field :query, value: params[:query], class: "form-input mt-0 pl-9", placeholder: t("designs.search_placeholder"), aria: { label: t("designs.search") } %></div>
+  <button type="button" class="button-secondary" data-mobile-menu-target="button" data-action="mobile-menu#open" aria-controls="design-filter-panel" aria-expanded="false"><%= ui_icon("settings", size: 16) %><%= t("designs.filters") %></button>
+  <div id="design-filter-panel" class="hidden" data-mobile-menu-target="panel" hidden aria-hidden="true"><button type="button" class="fixed inset-0 z-40 bg-ink/30 backdrop-blur-[2px]" aria-label="<%= t('forms.close') %>" data-action="mobile-menu#close"></button><section role="dialog" aria-modal="true" aria-label="<%= t('designs.filters') %>" class="fixed inset-x-0 bottom-0 z-50 max-h-[88dvh] overflow-y-auto rounded-t-2xl border border-line bg-surface p-4 shadow-2xl"><div class="mx-auto mb-4 h-1 w-10 rounded-full bg-line-strong"></div><div class="flex items-center justify-between"><div><p class="eyebrow"><%= t("designs.eyebrow") %></p><h2 class="mt-1 text-lg font-semibold text-ink"><%= t("designs.filters") %></h2></div><button type="button" class="button-secondary button-icon" aria-label="<%= t('forms.close') %>" data-mobile-menu-target="close" data-action="mobile-menu#close"><%= ui_icon("x", size: 17) %></button></div><div class="mt-5 space-y-4"><%= render "filters", form: form, suffix: "mobile" %></div><div class="mt-5 grid grid-cols-2 gap-2"><%= link_to t("forms.clear"), designs_path, class: "button-secondary" %><%= form.submit t("designs.apply_filters"), class: "button-primary" %></div></section></div>
+<% end %>
+
+<% if @filters_active %>
+  <% selected_garment = @garment_templates.find { |template| template.garment_type == params[:garment_type] } %>
+  <div class="mt-3 flex flex-wrap items-center gap-2 text-xs">
+    <span class="mr-1 font-semibold text-ink-muted"><%= t("designs.active_filters") %></span>
+    <% if params[:query].present? %><%= render "shared/filter_chip", label: params[:query], path: designs_path(request.query_parameters.except("page", "query")), remove_label: t("designs.remove_filter", filter: params[:query]) %><% end %>
+    <% if selected_garment %><%= render "shared/filter_chip", label: selected_garment.name, path: designs_path(request.query_parameters.except("page", "garment_type")), remove_label: t("designs.remove_filter", filter: selected_garment.name) %><% end %>
+    <% if params[:visibility].present? && Design.visibilities.key?(params[:visibility]) %><%= render "shared/filter_chip", label: t("designs.visibilities.#{params[:visibility]}"), path: designs_path(request.query_parameters.except("page", "visibility")), remove_label: t("designs.remove_filter", filter: t("designs.visibilities.#{params[:visibility]}")) %><% end %>
+    <% if params[:source_type].present? && Design.source_types.key?(params[:source_type]) %><%= render "shared/filter_chip", label: t("designs.sources.#{params[:source_type]}"), path: designs_path(request.query_parameters.except("page", "source_type")), remove_label: t("designs.remove_filter", filter: t("designs.sources.#{params[:source_type]}")) %><% end %>
+    <% %i[colour_family fabric_type occasion tag].each do |attribute| %><% if params[attribute].present? %><%= render "shared/filter_chip", label: params[attribute], path: designs_path(request.query_parameters.except("page", attribute.to_s)), remove_label: t("designs.remove_filter", filter: params[attribute]) %><% end %><% end %>
+    <% if params[:favourites] == "1" %><%= render "shared/filter_chip", label: t("design_favourites.saved"), path: designs_path(request.query_parameters.except("page", "favourites")), remove_label: t("designs.remove_filter", filter: t("design_favourites.saved")) %><% end %>
+    <% if params[:archived] == "1" %><%= render "shared/filter_chip", label: t("designs.views.all"), path: designs_path(request.query_parameters.except("page", "archived")), remove_label: t("designs.remove_filter", filter: t("designs.views.all")) %><% end %>
+    <span class="font-semibold text-ink"><%= t("designs.showing_count", count: @filtered_count) %></span>
+    <%= link_to t("forms.clear"), designs_path, class: "button-ghost button-sm" %>
+  </div>
+<% end %>
+
+<% if @designs.any? %>
+  <div class="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-5"><%= render @designs %></div>
+  <% if @pagy.previous || @pagy.next %><nav class="mt-5 flex items-center justify-between text-xs text-ink-muted" aria-label="Pagination"><% if @pagy.previous %><%= link_to t("forms.previous"), designs_path(request.query_parameters.merge(page: @pagy.previous)), class: "button-secondary button-sm" %><% else %><span></span><% end %><span><%= t("forms.page", page: @pagy.page) %></span><% if @pagy.next %><%= link_to t("forms.next"), designs_path(request.query_parameters.merge(page: @pagy.next)), class: "button-secondary button-sm" %><% end %></nav><% end %>
+<% else %>
+  <div class="mt-5"><%= render "shared/empty_state", title: t(@filters_active ? "designs.no_results" : "designs.empty"), description: t(@filters_active ? "designs.no_results_description" : "designs.empty_description"), icon: "designs", action: (@filters_active ? link_to(t("forms.clear"), designs_path, class: "button-secondary") : (link_to(t("designs.upload_first"), new_design_path, class: "button-primary") if policy(Design).create?)) %></div>
+<% end %>

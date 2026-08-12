@@ -1,0 +1,16 @@
+<div>
+  <%= form.label :status, t("payments.status"), for: "payment_status_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.select :status, options_for_select([[t("payments.statuses.active"), ""], [t("payments.statuses.all"), "all"], [t("payments.statuses.voided"), "voided"]], params[:status]), {}, id: "payment_status_#{suffix}", class: "form-input mt-0" %>
+</div>
+<div>
+  <%= form.label :payment_method, t("payments.method"), for: "payment_method_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.select :payment_method, options_for_select([[t("payments.all_methods"), ""]] + Payment.payment_methods.keys.map { |method| [t("payments.methods.#{method}"), method] }, params[:payment_method]), {}, id: "payment_method_#{suffix}", class: "form-input mt-0" %>
+</div>
+<div>
+  <%= form.label :from, t("payments.from"), for: "payment_from_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.date_field :from, value: params[:from], id: "payment_from_#{suffix}", class: "form-input mt-0", max: Date.current %>
+</div>
+<div>
+  <%= form.label :to, t("payments.to"), for: "payment_to_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.date_field :to, value: params[:to], id: "payment_to_#{suffix}", class: "form-input mt-0", max: Date.current %>
+</div>

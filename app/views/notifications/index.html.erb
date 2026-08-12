@@ -1,0 +1,24 @@
+<% content_for :title, t("notifications.index_title") %>
+<%= render "shared/page_header", title: t("notifications.title"),
+  description: (t("notifications.unread_count", count: @unread_count) if @unread_count.positive?),
+  action: (button_to t("notifications.mark_all_read"), read_all_notifications_path, method: :patch, class: "button-secondary button-sm" if @unread_count.positive?) %>
+
+<% if @notifications.any? %>
+  <div class="mt-5 grid gap-2">
+    <% @notifications.each do |notification| %>
+      <%= button_to read_notification_path(notification), method: :patch, class: "card flex w-full items-start gap-3 p-4 text-left #{'bg-surface-muted' unless notification.read?}" do %>
+        <span class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full <%= notification.read? ? 'bg-surface-muted text-ink-muted' : 'bg-brand/10 text-brand' %>">
+          <%= ui_icon(notification.work_assigned? ? "needle" : "notifications", size: 16) %>
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-semibold text-ink"><%= notification.title %></span>
+          <span class="mt-0.5 block text-xs text-ink-muted"><%= notification.message %></span>
+          <span class="mt-1 block text-[10px] text-ink-muted"><%= l(notification.created_at, format: :short) %></span>
+        </span>
+        <% unless notification.read? %><span class="mt-1 size-2 shrink-0 rounded-full bg-brand" aria-hidden="true"></span><% end %>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="mt-5"><%= render "shared/empty_state", title: t("notifications.empty"), description: t("notifications.empty_description"), icon: "notifications" %></div>
+<% end %>

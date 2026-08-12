@@ -1,0 +1,45 @@
+lus:
+  app:
+    name: "Puitei Chhakchhuak"
+    tagline: "I business mil tura siam"
+  authorization:
+    denied: "He hna tih phalna i nei lo."
+  navigation:
+    dashboard: "Dashboard"
+    orders: "Order-te"
+    customers: "Customer-te"
+    inventory: "Inventory"
+    deliveries: "Hlan chhuah"
+    designs: "Design Studio"
+    payment_settings: "Payment settings"
+  customers:
+    title: "Customer-te"
+    new: "Customer thar"
+    edit: "Customer siamthat"
+    phone: "Phone"
+    notes: "Notes"
+  measurement_profiles:
+    title: "Tehna profile-te"
+    new: "Tehna profile thar"
+  measurements:
+    new: "Tehna record rawh"
+    history: "Tehna history"
+    new_version: "Version thar"
+  workflow:
+    customer: "Customer"
+    measurement: "Tehna"
+    order: "Order"
+    production: "Siamna"
+    payment: "Pekna"
+    delivery: "Hlan chhuahna"
+  inventory:
+    title: "Inventory"
+    new: "Inventory item thar"
+    low_stock: "Stock tlem"
+    on_hand: "Stock awm"
+    reserved: "Dah hran"
+    available: "Hman theih"
+  deliveries:
+    desk: "Hlan chhuahna"
+    ready: "Hlan theih"
+    complete_handover: "Hlan chhuah zo rawh"

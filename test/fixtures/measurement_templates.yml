@@ -1,0 +1,9 @@
+blouse:
+  name: Blouse
+  garment_type: blouse
+  active: true
+
+shirt:
+  name: Shirt
+  garment_type: shirt
+  active: true

@@ -1,0 +1,7 @@
+<% content_for :title, t("expenses.new_title") %>
+
+<div class="flex items-center justify-between"><%= render "shared/back_link", path: expenses_path, label: t("expenses.dashboard") %></div>
+<div class="mx-auto mt-4 max-w-3xl">
+  <%= render "shared/page_header", eyebrow: t("expenses.eyebrow"), title: t("expenses.new"), description: t("expenses.new_description") %>
+  <div class="mt-5"><%= render "form", expense: @expense %></div>
+</div>

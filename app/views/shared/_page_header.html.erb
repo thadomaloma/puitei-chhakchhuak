@@ -1,0 +1,8 @@
+<header class="premium-page-header">
+  <div class="min-w-0">
+    <% if local_assigns[:eyebrow].present? %><p class="eyebrow"><%= eyebrow %></p><% end %>
+    <h1 class="page-title <%= 'mt-0.5' if local_assigns[:eyebrow].present? %>"><%= title %></h1>
+    <% if local_assigns[:description].present? %><p class="mt-1 max-w-3xl supporting-text"><%= description %></p><% end %>
+  </div>
+  <% if local_assigns[:action].present? || local_assigns[:secondary_action].present? %><div class="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:shrink-0" data-page-actions><%= secondary_action if local_assigns[:secondary_action].present? %><%= action if local_assigns[:action].present? %></div><% end %>
+</header>

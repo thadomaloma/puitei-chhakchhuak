@@ -1,0 +1,12 @@
+<section class="auth-card">
+  <div class="mb-7"><%= render "shared/brand", full: true %></div>
+  <h1 class="page-title">Choose a new password</h1>
+  <p class="supporting-text mt-1.5">Use a strong password you haven’t used for Puitei Chhakchhuak before.</p>
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "mt-6 space-y-4" }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+    <%= f.hidden_field :reset_password_token %>
+    <div><%= f.label :password, "New password", class: "block text-xs font-semibold text-ink" %><%= f.password_field :password, autofocus: true, autocomplete: "new-password", required: true, class: "form-input" %><% if @minimum_password_length %><p class="mt-1 text-[11px] text-ink-muted"><%= @minimum_password_length %> characters minimum</p><% end %></div>
+    <div><%= f.label :password_confirmation, "Confirm new password", class: "block text-xs font-semibold text-ink" %><%= f.password_field :password_confirmation, autocomplete: "new-password", required: true, class: "form-input" %></div>
+    <%= f.submit "Change password", class: "button-primary w-full" %>
+  <% end %>
+</section>

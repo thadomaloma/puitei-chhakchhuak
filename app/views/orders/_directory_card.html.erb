@@ -1,0 +1,13 @@
+<% total = order_display_total(order) %>
+<article class="card p-4">
+  <div class="flex items-start justify-between gap-3">
+    <div class="min-w-0"><p class="font-mono text-[11px] font-semibold text-brand"><%= order.order_number %></p><%= link_to order.customer.full_name, order.customer, class: "mt-1 block truncate text-base font-semibold tracking-[-0.01em] text-ink" %><p class="mt-0.5 text-xs text-ink-muted"><%= order.customer.phone_number %></p></div>
+    <%= order_status_badge(order) %>
+  </div>
+  <dl class="mt-4 grid grid-cols-3 gap-2 border-y border-line py-3">
+    <div><dt class="detail-label"><%= t("orders.items") %></dt><dd class="mt-1 text-sm font-semibold text-ink"><%= order.order_items.sum(&:quantity) %></dd></div>
+    <div><dt class="detail-label"><%= t("payments.total") %></dt><dd class="mt-1 truncate tabular text-sm font-semibold text-ink"><%= money(total, order.currency) %></dd></div>
+    <div><dt class="detail-label"><%= t("orders.delivery") %></dt><dd class="mt-1 text-sm font-semibold text-ink"><%= l(order.delivery_date, format: :short) %></dd></div>
+  </dl>
+  <div class="mt-3 flex items-center justify-between gap-3"><p class="text-xs <%= order_delivery_state(order) == 'overdue' ? 'font-semibold text-[#b42318]' : 'text-ink-muted' %>"><%= order_delivery_label(order) %></p><%= link_to t("orders.view_order"), order, class: "button-secondary button-sm" %></div>
+</article>

@@ -1,0 +1,42 @@
+alice:
+  shop: primary
+  branch: main
+  customer_code: CUS-ALICE01
+  full_name: Alice Chhangte
+  phone_number: "9876500001"
+  whatsapp_number: "9876500001"
+  email: alice@example.test
+  gender: 1
+  city: Aizawl
+  preferred_language: en
+  active: true
+
+bina:
+  shop: primary
+  branch: main
+  customer_code: CUS-BINA0001
+  full_name: Bina Lal
+  phone_number: "9876500002"
+  gender: 1
+  preferred_language: lus
+  active: false
+
+other_branch:
+  shop: primary
+  branch: second
+  customer_code: CUS-OTHER001
+  full_name: Other Customer
+  phone_number: "9876500001"
+  gender: 0
+  preferred_language: en
+  active: true
+
+carol:
+  shop: primary
+  branch: main
+  customer_code: CUS-CAROL001
+  full_name: Carol Ralte
+  phone_number: "9876500003"
+  gender: 1
+  preferred_language: en
+  active: true

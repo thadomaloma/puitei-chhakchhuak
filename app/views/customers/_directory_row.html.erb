@@ -1,0 +1,10 @@
+<% metric = @customer_metrics.fetch(customer.id) %>
+<tr>
+  <td><div class="flex items-center gap-3"><%= render "avatar", customer: customer, size_class: "size-9" %><div class="min-w-0"><%= link_to customer.full_name, customer_path(customer), class: "font-semibold text-ink hover:text-emerald-refined", data: { turbo_frame: "_top" } %><p class="font-mono text-[10px] text-ink-muted"><%= customer.customer_code %> · <%= customer.branch.name %></p></div></div></td>
+  <td><p class="text-xs text-ink"><%= customer.phone_number %></p><% if customer.whatsapp_number.present? %><p class="mt-0.5 text-[10px] text-emerald-refined"><%= t("customers.whatsapp_available") %></p><% end %></td>
+  <td><% if metric[:last_order_on] %><p class="tabular text-xs font-medium text-ink"><%= l(metric[:last_order_on]) %></p><% else %><span class="text-xs text-ink-muted">—</span><% end %></td>
+  <td class="tabular text-right font-semibold"><%= metric[:order_count] %></td>
+  <td class="tabular text-right font-semibold <%= metric[:outstanding_balance].positive? ? 'text-[#b54708]' : 'text-ink-muted' %>"><%= money(metric[:outstanding_balance]) %></td>
+  <td><%= status_badge(customer.active? ? "active" : "archived", label: customer.active? ? t("customers.active_label") : t("customers.archived_label"), variant: customer.active? ? "success" : "neutral") %></td>
+  <td class="relative text-right"><%= render "row_actions", customer: customer %></td>
+</tr>

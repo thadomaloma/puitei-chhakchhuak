@@ -1,0 +1,1 @@
+<% content_for :title, t("staff.new_title") %><%= render "shared/back_link", path: staff_index_path, label: t("staff.directory") %><div class="mx-auto mt-4 max-w-3xl"><%= render "shared/page_header", eyebrow: t("staff.eyebrow"), title: t("staff.new"), description: t("staff.new_description") %><div class="mt-5"><%= render "form", staff_member: @staff %></div></div>

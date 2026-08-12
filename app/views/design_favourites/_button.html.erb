@@ -1,0 +1,7 @@
+<%= turbo_frame_tag dom_id(design, :favourite) do %>
+  <% if favourite %>
+    <%= button_to ui_icon("check", size: 14) + t("design_favourites.saved"), design_favourite_path(design, compact: (local_assigns[:compact] ? 1 : 0)), method: :delete, class: "button-secondary #{local_assigns[:compact] ? 'button-sm w-full' : ''}", aria: { label: t("design_favourites.remove", title: design.title) } %>
+  <% else %>
+    <%= button_to t("design_favourites.save"), design_favourite_path(design, compact: (local_assigns[:compact] ? 1 : 0)), method: :post, class: "button-ghost #{local_assigns[:compact] ? 'button-sm w-full' : ''}", aria: { label: t("design_favourites.add", title: design.title) } %>
+  <% end %>
+<% end %>

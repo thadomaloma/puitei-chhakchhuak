@@ -1,0 +1,42 @@
+<% photos = @measurement_profiles.flat_map { |profile| profile.measurements.flat_map { |measurement| measurement.photos.attachments } } %>
+<% if @design_selection_access %>
+  <section>
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div><p class="eyebrow"><%= t("design_selections.eyebrow") %></p><h2 class="section-title mt-1"><%= t("design_selections.customer_gallery") %></h2><p class="supporting-text"><%= t("design_selections.customer_gallery_description") %></p></div>
+      <div class="flex gap-2"><% if policy(DesignSelection).create? && @customer.active? %><%= link_to ui_icon("plus", size: 15) + t("design_selections.add_design"), new_design_selection_path(customer_id: @customer.id), class: "button-primary button-sm" %><% end %><% if policy(DesignShare).create? && @design_selections.any? %><%= link_to t("design_shares.share"), new_design_share_path(customer_id: @customer.id, design_ids: @design_selections.map(&:design_id)), class: "button-secondary button-sm" %><% end %></div>
+    </div>
+
+    <div class="mt-4 grid grid-cols-3 gap-2 sm:max-w-xl">
+      <% [[t("design_selections.metrics.active"), @active_design_selection_count], [t("design_selections.statuses.shortlisted"), @design_selection_counts.fetch("shortlisted", 0)], [t("design_selections.statuses.approved"), @design_selection_counts.fetch("approved", 0)]].each do |label, value| %><div class="rounded-xl border border-line bg-surface-muted/50 px-3 py-2"><p class="text-[10px] font-semibold uppercase tracking-wide text-ink-muted"><%= label %></p><p class="mt-1 text-xl font-semibold tabular text-ink"><%= value %></p></div><% end %>
+    </div>
+
+    <% filters = [[nil, t("design_selections.filters.all")], ["shortlisted", t("design_selections.statuses.shortlisted")], ["approved", t("design_selections.statuses.approved")], ["rejected", t("design_selections.statuses.rejected")], ["used", t("design_selections.statuses.used")], ["archived", t("design_selections.filters.archived")]] %>
+    <nav class="mt-4 overflow-x-auto" aria-label="<%= t("design_selections.filter_label") %>"><div class="segmented-control w-max"><% filters.each do |value, label| %><% active = params[:selection_status].presence == value %><%= link_to label, customer_path(@customer, tab: "gallery", selection_status: value), class: "segmented-item #{active ? 'segmented-item-active' : ''}", aria: (active ? { current: "page" } : {}) %><% end %></div></nav>
+
+    <% if @design_selections.any? %>
+      <div class="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <% @design_selections.each do |selection| %>
+          <article class="overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+            <%= link_to design_path(selection.design), class: "block" do %>
+              <% if (image = selection.design.primary_image_attachment) %><%= image_tag image.variant(:thumb), alt: selection.design.title, class: "aspect-[4/3] w-full object-cover", loading: "lazy", width: 480, height: 360 %><% else %><span class="grid aspect-[4/3] w-full place-items-center bg-surface-muted text-ink-muted"><%= ui_icon("designs", size: 32) %></span><% end %>
+              <div class="p-3.5"><div class="flex items-start justify-between gap-3"><div><h3 class="text-sm font-semibold text-ink"><%= selection.design.title %></h3><p class="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-muted"><%= selection.design.garment_type.humanize %></p></div><%= status_badge(selection.archived? ? "archived" : selection.status, label: t(selection.archived? ? "design_selections.filters.archived" : "design_selections.statuses.#{selection.status}"), variant: selection.approved? || selection.shortlisted? ? "success" : (selection.rejected? ? "danger" : "neutral")) %></div><p class="mt-1 text-[11px] text-ink-muted"><%= t("design_selections.selected_on", date: l(selection.selected_at.to_date), name: selection.selected_by.name) %></p><% if selection.approved_at %><p class="mt-1 text-[11px] text-ink-muted"><%= t("design_selections.approved_on", date: l(selection.approved_at.to_date)) %></p><% end %><% if selection.customer_note.present? %><p class="mt-2 text-xs leading-5 text-ink-muted"><%= selection.customer_note %></p><% end %><% if selection.internal_note.present? && policy(selection).manage_internal_notes? %><p class="mt-2 rounded-lg bg-surface-muted px-2.5 py-2 text-[11px] leading-4 text-ink-muted"><%= t("design_selections.internal_note") %>: <%= selection.internal_note %></p><% end %></div>
+            <% end %>
+            <div class="border-t border-line p-3">
+              <% if selection.archived? %>
+                <% if policy(selection).restore? %><%= button_to t("design_selections.restore"), restore_design_selection_path(selection), method: :patch, class: "button-secondary button-sm w-full", form: { data: { turbo_confirm: t("design_selections.restore_confirm") } } %><% end %>
+              <% else %>
+                <%= form_with model: selection, class: "flex items-center gap-2" do |form| %><%= form.label :status, t("design_selections.status"), class: "sr-only" %><%= form.select :status, selection.available_statuses.map { |status| [t("design_selections.statuses.#{status}"), status] }, {}, class: "form-input mt-0 min-w-0 flex-1 text-xs" %><%= form.submit t("forms.save"), class: "button-secondary button-sm" %><% end %>
+                <% if policy(selection).archive? %><%= button_to t("design_selections.remove"), design_selection_path(selection), method: :delete, class: "button-ghost button-sm mt-2 w-full text-[#b42318]", form: { data: { turbo_confirm: t("design_selections.remove_confirm") } } %><% end %>
+              <% end %>
+            </div>
+          </article>
+        <% end %>
+      </div>
+      <% if @design_selection_pagy&.previous || @design_selection_pagy&.next %><nav class="mt-5 flex items-center justify-between text-xs text-ink-muted" aria-label="Pagination"><% if @design_selection_pagy.previous %><%= link_to t("forms.previous"), customer_path(@customer, request.query_parameters.merge(selection_page: @design_selection_pagy.previous)), class: "button-secondary button-sm" %><% else %><span></span><% end %><span><%= t("forms.page", page: @design_selection_pagy.page) %></span><% if @design_selection_pagy.next %><%= link_to t("forms.next"), customer_path(@customer, request.query_parameters.merge(selection_page: @design_selection_pagy.next)), class: "button-secondary button-sm" %><% end %></nav><% end %>
+    <% else %>
+      <div class="mt-4"><%= render "shared/empty_state", title: t("design_selections.empty_filtered"), description: t("design_selections.empty_filtered_description"), icon: "designs", action: (link_to(t("design_selections.add_design"), new_design_selection_path(customer_id: @customer.id), class: "button-primary") if policy(DesignSelection).create? && params[:selection_status].blank?) %></div>
+    <% end %>
+  </section>
+<% end %>
+
+<% if @measurement_access %><section class="mt-8 border-t border-line pt-6"><div><p class="eyebrow"><%= t("customers.tabs.gallery") %></p><h2 class="section-title mt-1"><%= t("customers.reference_gallery") %></h2><p class="supporting-text"><%= t("customers.reference_gallery_description") %></p></div><% if @customer.profile_photo.attached? || photos.any? %><div class="mt-3 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4"><% if @customer.profile_photo.attached? %><%= image_tag @customer.profile_photo.variant(:thumb), alt: t("customers.profile_photo_alt", name: @customer.full_name), class: "aspect-square w-full rounded-xl border border-line object-cover" %><% end %><% photos.each do |photo| %><%= image_tag photo.variant(:thumb), alt: t("measurements.reference_photo_alt"), class: "aspect-square w-full rounded-xl border border-line object-cover" %><% end %></div><% else %><div class="mt-3"><%= render "shared/empty_state", title: t("customers.no_gallery"), description: t("customers.no_gallery_description"), icon: "ruler" %></div><% end %></section><% end %>

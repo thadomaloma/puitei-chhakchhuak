@@ -1,0 +1,41 @@
+<% content_for :title, t("design_selections.new") %>
+<%= render "shared/back_link", path: (@selected_customer ? customer_path(@selected_customer, tab: "gallery") : (@selected_design || designs_path)), label: t("forms.cancel") %>
+<div class="mt-3"><%= render "shared/page_header", eyebrow: t("design_selections.eyebrow"), title: t("design_selections.new"), description: t("design_selections.new_description") %></div>
+
+<%= form_with url: new_design_selection_path, method: :get, class: "toolbar mt-5" do |filter| %>
+  <%= filter.hidden_field :customer_id, value: @selected_customer&.id %>
+  <%= filter.hidden_field :design_id, value: @selected_design&.id %>
+  <div class="relative min-w-0 flex-1"><span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-muted"><%= ui_icon("search", size: 16) %></span><%= filter.search_field :query, value: params[:query], class: "form-input mt-0 pl-9", placeholder: t("design_selections.customer_search"), aria: { label: t("design_selections.customer_search") } %></div>
+  <div class="relative min-w-0 flex-1"><span class="pointer-events-none absolute inset-y-0 left-3 flex items-center text-ink-muted"><%= ui_icon("search", size: 16) %></span><%= filter.search_field :design_query, value: params[:design_query], class: "form-input mt-0 pl-9", placeholder: t("design_selections.design_search"), aria: { label: t("design_selections.design_search") } %></div>
+  <%= filter.submit t("designs.apply_filters"), class: "button-secondary" %>
+<% end %>
+
+<%= form_with model: @design_selection, url: design_selections_path, class: "mt-5 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_22rem]" do |form| %>
+  <section class="section-card">
+    <%= render "shared/form_errors", record: @design_selection %>
+    <div class="grid gap-4 sm:grid-cols-2">
+      <div><%= form.label :customer_id, t("design_selections.customer"), class: "form-label" %><%= form.collection_select :customer_id, @customers, :id, :full_name, { prompt: t("design_selections.choose_customer"), selected: @selected_customer&.id }, { class: "form-input", required: true } %></div>
+      <div><%= form.label :status, t("design_selections.status"), class: "form-label" %><%= form.select :status, DesignSelection.statuses.keys.map { |status| [t("design_selections.statuses.#{status}"), status] }, {}, class: "form-input" %></div>
+    </div>
+    <div class="mt-4"><%= form.label :customer_note, t("design_selections.customer_note"), class: "form-label" %><%= form.text_area :customer_note, rows: 3, class: "form-input", placeholder: t("design_selections.customer_note_placeholder") %></div>
+    <% if policy(@design_selection).manage_internal_notes? %><div class="mt-4"><%= form.label :internal_note, t("design_selections.internal_note"), class: "form-label" %><%= form.text_area :internal_note, rows: 3, class: "form-input", placeholder: t("design_selections.internal_note_placeholder") %></div><% end %>
+  </section>
+
+  <aside class="section-card lg:sticky lg:top-24">
+    <p class="eyebrow"><%= t("design_selections.designs") %></p>
+    <h2 class="mt-1 section-title"><%= t("design_selections.choose_designs") %></h2>
+    <p class="supporting-text"><%= t("design_selections.choose_designs_description") %></p>
+    <div class="mt-4 max-h-[32rem] space-y-2 overflow-y-auto pr-1">
+      <% @designs.each do |design| %>
+        <% already_selected = @selected_design_ids.include?(design.id) %>
+        <label class="flex items-center gap-3 rounded-xl border border-line p-2.5 transition <%= already_selected ? 'cursor-not-allowed bg-surface-muted opacity-70' : 'cursor-pointer hover:border-line-strong has-[:checked]:border-gold has-[:checked]:bg-gold-soft/50' %>">
+          <%= check_box_tag "design_ids[]", design.id, !already_selected && design.id == @selected_design&.id, disabled: already_selected, class: "size-4 rounded border-line text-brand", aria: { label: design.title } %>
+          <% if (image = design.primary_image_attachment) %><%= image_tag image.variant(:thumb), alt: "", class: "size-14 rounded-lg object-cover", width: 56, height: 56 %><% else %><span class="grid size-14 place-items-center rounded-lg bg-surface-muted"><%= ui_icon("designs", size: 20) %></span><% end %>
+          <span class="min-w-0 flex-1"><span class="block truncate text-xs font-semibold text-ink"><%= design.title %></span><span class="block text-[10px] text-ink-muted"><%= design.garment_type.humanize %></span></span>
+          <% if already_selected %><span class="status-badge status-neutral"><%= t("design_selections.already_selected") %></span><% end %>
+        </label>
+      <% end %>
+    </div>
+    <%= form.submit t("design_selections.save"), class: "button-primary mt-5 w-full" %>
+  </aside>
+<% end %>

@@ -1,0 +1,34 @@
+blouse_reference:
+  shop: primary
+  uploaded_by: manager
+  rights_confirmed_by: manager
+  title: Pearl-edge blouse
+  description: Refined blouse reference for celebration tailoring.
+  garment_type: blouse
+  visibility: 1
+  source_type: 0
+  colour_family: Ivory
+  fabric_type: Silk
+  sleeve_style: Elbow sleeve
+  neck_style: Round neck
+  occasion: Wedding
+  tags:
+    - bridal
+    - pearl
+  estimated_price: 2400
+  estimated_minutes: 360
+  internal_notes: Keep the pearl edge balanced at the neckline.
+  active: true
+  rights_confirmed_at: <%= 2.days.ago %>
+
+foreign_reference:
+  shop: foreign
+  uploaded_by: manager
+  rights_confirmed_by: manager
+  title: Foreign shop design
+  garment_type: shirt
+  visibility: 0
+  source_type: 0
+  tags: []
+  active: true
+  rights_confirmed_at: <%= 1.day.ago %>

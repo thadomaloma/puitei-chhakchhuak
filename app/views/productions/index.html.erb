@@ -1,0 +1,62 @@
+<% content_for :title, t("production.index_title") %>
+
+<%= render "shared/page_header", eyebrow: t("production.eyebrow"), title: t("production.title"), description: t("production.directory_description", count: @open_count) %>
+
+<section class="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-4" aria-label="<%= t('production.summary') %>">
+  <%= render "shared/stat_card", label: t("production.in_progress"), value: @in_progress_count, detail: t("production.active_work"), icon: "clock", tone: "info", href: production_path(status: "in_progress") %>
+  <%= render "shared/stat_card", label: t("production.unassigned"), value: @unassigned_count, detail: t("production.needs_owner"), icon: "user", tone: (@unassigned_count.positive? ? "warning" : "neutral"), href: production_path(assignment: "unassigned") %>
+  <%= render "shared/stat_card", label: t("production.due_today"), value: @due_today_count, detail: l(Date.current), icon: "calendar", tone: (@due_today_count.positive? ? "warning" : "neutral"), href: production_path(urgency: "today") %>
+  <%= render "shared/stat_card", label: t("production.overdue"), value: @overdue_count, detail: t("production.needs_attention"), icon: "warning", tone: (@overdue_count.positive? ? "danger" : "neutral"), href: production_path(urgency: "overdue") %>
+</section>
+
+<section class="section-card mt-5">
+  <div class="flex flex-wrap items-end justify-between gap-3"><div><p class="eyebrow"><%= t("production.workflow") %></p><h2 class="section-title mt-1"><%= t("production.stage_workload") %></h2><p class="supporting-text mt-1"><%= t("production.stage_workload_description") %></p></div><%= link_to t("production.show_all"), production_path, class: "button-ghost button-sm" %></div>
+  <div class="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+    <% ProductionTask.stages.keys.each_with_index do |stage, index| %>
+      <% active = params[:stage] == stage %>
+      <%= link_to production_path(request.query_parameters.except(:page).merge(stage: (active ? nil : stage))), class: "group rounded-xl border p-3.5 transition #{active ? 'border-brand bg-[#f4f7f6] shadow-sm' : 'border-line bg-surface hover:border-brand/30 hover:bg-surface-muted/40'}" do %>
+        <div class="flex items-start justify-between gap-3"><span class="grid size-7 place-items-center rounded-lg <%= active ? 'bg-brand text-white' : 'bg-surface-muted text-ink-muted group-hover:text-brand' %> text-xs font-semibold"><%= index + 1 %></span><span class="tabular text-xl font-semibold tracking-[-0.03em] text-ink"><%= @stage_counts.fetch(stage, 0) %></span></div>
+        <h3 class="mt-3 text-sm font-semibold text-ink"><%= t("production.stages.#{stage}") %></h3><p class="mt-1 text-[11px] leading-4 text-ink-muted"><%= t("production.stage_descriptions.#{stage}") %></p>
+      <% end %>
+    <% end %>
+  </div>
+</section>
+
+<% if @staff_workload.any? %>
+  <section class="section-card mt-4">
+    <p class="eyebrow"><%= t("production.workflow") %></p>
+    <h2 class="section-title mt-1"><%= t("production.staff_workload") %></h2>
+    <p class="supporting-text mt-1"><%= t("production.staff_workload_description") %></p>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <% @staff_workload.each do |row| %>
+        <span class="inline-flex items-center gap-2 rounded-full border border-line bg-surface-muted/45 py-1.5 pl-1.5 pr-3 text-xs font-medium text-ink">
+          <%= render "shared/avatar", name: row[:staff].name, size: "sm" %>
+          <span><%= row[:staff].name %> · <%= t("production.active_count", count: row[:active]) %></span>
+        </span>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<%= form_with url: production_path, method: :get, class: "toolbar mt-5", data: { controller: "mobile-menu", action: "keydown.esc@window->mobile-menu#close" } do |form| %>
+  <div class="grid gap-3 xl:grid-cols-[minmax(17rem,1fr)_8rem_8rem_8rem_8rem_auto] xl:items-end">
+    <div><%= form.label :query, t("production.search"), class: "mb-1.5 block text-xs font-semibold text-ink" %><div class="relative"><span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted"><%= ui_icon("search", size: 16) %></span><%= form.search_field :query, value: params[:query], placeholder: t("production.search"), class: "form-input mt-0 pl-9", autocomplete: "off" %></div></div>
+    <div class="hidden xl:contents"><%= render "filters", form: form, suffix: "desktop" %></div>
+    <div class="grid grid-cols-2 gap-2 xl:block"><button type="button" class="button-secondary xl:hidden" data-mobile-menu-target="button" data-action="mobile-menu#open" aria-controls="production-filter-panel" aria-expanded="false"><%= ui_icon("more", size: 16) %><%= t("production.filters") %></button><%= form.submit t("production.filter"), class: "button-primary w-full" %></div>
+  </div>
+  <div id="production-filter-panel" class="hidden xl:hidden" data-mobile-menu-target="panel" hidden aria-hidden="true">
+    <button type="button" class="fixed inset-0 z-40 bg-ink/30 backdrop-blur-[2px]" aria-label="<%= t('forms.close') %>" data-action="click->mobile-menu#close"></button>
+    <section role="dialog" aria-modal="true" aria-label="<%= t('production.filters') %>" class="fixed inset-x-0 bottom-0 z-50 max-h-[88vh] overflow-y-auto rounded-t-2xl border border-line bg-surface p-4 shadow-2xl"><div class="mx-auto mb-4 h-1 w-10 rounded-full bg-line-strong"></div><div class="flex items-center justify-between"><div><p class="eyebrow"><%= t("production.eyebrow") %></p><h2 class="mt-1 text-lg font-semibold text-ink"><%= t("production.filters") %></h2></div><button type="button" class="button-secondary button-icon" aria-label="<%= t('forms.close') %>" data-mobile-menu-target="close" data-action="mobile-menu#close"><%= ui_icon("x", size: 17) %></button></div><div class="mt-5 space-y-4"><%= render "filters", form: form, suffix: "mobile" %></div><div class="mt-5 grid grid-cols-2 gap-2"><%= link_to t("forms.clear"), production_path, class: "button-secondary" %><%= form.submit t("production.apply_filters"), class: "button-primary" %></div></section>
+  </div>
+<% end %>
+
+<% if @filters_active %><div class="mt-3 flex flex-wrap items-center gap-2 text-xs"><span class="font-semibold text-ink"><%= t("production.active_filters") %></span><% if params[:query].present? %><span class="status-badge status-neutral"><%= params[:query] %></span><% end %><% if params[:stage].present? %><span class="status-badge status-info"><%= t("production.stages.#{params[:stage]}") %></span><% end %><% if params[:status].present? %><span class="status-badge status-neutral"><%= params[:status] == "all" ? t("production.all_history") : t("production.statuses.#{params[:status]}") %></span><% end %><% if params[:urgency].present? %><span class="status-badge status-warning"><%= t("production.urgencies.#{params[:urgency]}") %></span><% end %><% if params[:assignment].present? || params[:mine] == "1" %><span class="status-badge status-neutral"><%= (params[:assignment] == "unassigned" ? t("production.unassigned") : t("production.my_tasks")) %></span><% end %><%= link_to t("forms.clear"), production_path, class: "font-semibold text-brand hover:text-brand-hover" %></div><% end %>
+
+<div class="mt-5 flex flex-wrap items-end justify-between gap-3"><div><p class="eyebrow"><%= t("production.live_queue") %></p><h2 class="section-title mt-1"><%= t("production.task_queue") %></h2><p class="supporting-text mt-1"><%= t("production.results", count: @filtered_count) %></p></div><%= link_to t("production.my_tasks"), production_path(assignment: "mine"), class: "button-secondary button-sm" %></div>
+
+<% if @tasks.any? %>
+  <div class="mt-4 space-y-3"><% @tasks.each do |task| %><%= render "production_tasks/task", task: task, show_order: true, assignees: @active_staff_by_branch.fetch(task.branch.id, []) %><% end %></div>
+  <nav class="mt-5 flex items-center justify-between text-xs text-ink-muted" aria-label="Pagination"><% if @pagy.previous %><%= link_to t("forms.previous"), production_path(request.query_parameters.merge(page: @pagy.previous)), class: "button-secondary button-sm" %><% else %><span></span><% end %><span><%= t("forms.page", page: @pagy.page) %></span><% if @pagy.next %><%= link_to t("forms.next"), production_path(request.query_parameters.merge(page: @pagy.next)), class: "button-secondary button-sm" %><% end %></nav>
+<% else %>
+  <div class="mt-4"><%= render "shared/empty_state", title: (@open_count.zero? ? t("production.empty_first") : t("production.empty")), description: (@open_count.zero? ? t("production.empty_first_description") : t("production.empty_description")), icon: "production" %></div>
+<% end %>

@@ -1,0 +1,25 @@
+main_settings:
+  shop: primary
+  branch: main
+  shop_name: Main Puitei Chhakchhuak
+  currency: INR
+  measurement_unit: inches
+  invoice_prefix: TLR
+  tax_rate: 0
+  default_delivery_days: 14
+  business_hours: {}
+  low_stock_threshold: 5
+  locale: en
+
+second_settings:
+  shop: primary
+  branch: second
+  shop_name: Second Puitei Chhakchhuak
+  currency: INR
+  measurement_unit: centimetres
+  invoice_prefix: TLS
+  tax_rate: 5
+  default_delivery_days: 10
+  business_hours: {}
+  low_stock_threshold: 3
+  locale: en

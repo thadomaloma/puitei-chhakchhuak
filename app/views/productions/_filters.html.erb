@@ -1,0 +1,16 @@
+<div>
+  <%= form.label :stage, t("production.stage"), for: "production_stage_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.select :stage, options_for_select([[t("production.all_stages"), ""]] + ProductionTask.stages.keys.map { |stage| [t("production.stages.#{stage}"), stage] }, params[:stage]), {}, id: "production_stage_#{suffix}", class: "form-input mt-0" %>
+</div>
+<div>
+  <%= form.label :status, t("production.status"), for: "production_status_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.select :status, options_for_select([[t("production.open_tasks"), ""], [t("production.all_history"), "all"]] + ProductionTask.statuses.keys.map { |status| [t("production.statuses.#{status}"), status] }, params[:status]), {}, id: "production_status_#{suffix}", class: "form-input mt-0" %>
+</div>
+<div>
+  <%= form.label :urgency, t("production.urgency"), for: "production_urgency_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.select :urgency, options_for_select([[t("production.any_urgency"), ""], [t("production.urgencies.overdue"), "overdue"], [t("production.urgencies.today"), "today"], [t("production.urgencies.due_soon"), "due_soon"], [t("production.urgencies.this_week"), "this_week"]], params[:urgency]), {}, id: "production_urgency_#{suffix}", class: "form-input mt-0" %>
+</div>
+<div>
+  <%= form.label :assignment, t("production.assignment"), for: "production_assignment_#{suffix}", class: "mb-1.5 block text-xs font-semibold text-ink" %>
+  <%= form.select :assignment, options_for_select([[t("production.any_assignment"), ""], [t("production.my_tasks"), "mine"], [t("production.unassigned"), "unassigned"]], params[:assignment].presence || ("mine" if params[:mine] == "1")), {}, id: "production_assignment_#{suffix}", class: "form-input mt-0" %>
+</div>

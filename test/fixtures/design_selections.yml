@@ -1,0 +1,9 @@
+alice_blouse:
+  shop: primary
+  customer: alice
+  design: blouse_reference
+  selected_by: manager
+  status: 1
+  customer_note: Likes the pearl neckline.
+  internal_note: Confirm bead stock before approval.
+  selected_at: <%= 1.day.ago %>

@@ -1,0 +1,11 @@
+completed_concept:
+  shop: primary
+  requested_by: manager
+  source_design: blouse_reference
+  request_type: 1
+  prompt: Create a muted gold colour concept.
+  status: 2
+  provider: disabled
+  credit_cost: 2
+  completed_at: <%= 1.day.ago %>
+  metadata: {}

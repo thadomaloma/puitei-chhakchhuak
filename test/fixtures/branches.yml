@@ -1,0 +1,18 @@
+main:
+  shop: primary
+  name: Main Studio
+  code: MAIN
+  phone: "+91 11111 11111"
+  email: main@example.test
+  address: Aizawl
+  active: true
+  locale: en
+  time_zone: Asia/Kolkata
+
+second:
+  shop: primary
+  name: Second Studio
+  code: SECOND
+  active: true
+  locale: en
+  time_zone: Asia/Kolkata

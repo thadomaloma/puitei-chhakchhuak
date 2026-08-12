@@ -1,0 +1,33 @@
+<%= form_with model: inventory_item, class: "mx-auto max-w-5xl space-y-4", data: { controller: "image-preview" } do |form| %>
+  <%= render "shared/form_errors", record: inventory_item %>
+
+  <section class="form-section">
+    <div><h2 class="section-title"><%= t("inventory.item_details") %></h2><p class="supporting-text"><%= t("inventory.item_details_description") %></p></div>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div><%= form.label :name, t("inventory.name"), class: "text-xs font-semibold text-ink" %><%= form.text_field :name, class: "form-input", required: true, autofocus: true, autocomplete: "off" %></div>
+      <div><%= form.label :sku, t("inventory.sku"), class: "text-xs font-semibold text-ink" %><%= form.text_field :sku, class: "form-input font-mono uppercase", required: true, autocomplete: "off", placeholder: "FAB-SILK-001" %></div>
+      <div><%= form.label :category, t("inventory.category"), class: "text-xs font-semibold text-ink" %><%= form.select :category, InventoryItem.categories.keys.map { |category| [t("inventory.categories.#{category}"), category] }, {}, class: "form-input" %></div>
+      <div><%= form.label :unit, t("inventory.unit"), class: "text-xs font-semibold text-ink" %><%= form.select :unit, InventoryItem.units.keys.map { |unit| [t("inventory.unit_names.#{unit}"), unit] }, {}, class: "form-input" %></div>
+      <div><%= form.label :color, t("inventory.color"), class: "text-xs font-semibold text-ink" %><%= form.text_field :color, class: "form-input", autocomplete: "off", placeholder: t("inventory.color_placeholder") %></div>
+      <div><%= form.label :reorder_level, t("inventory.reorder_level"), class: "text-xs font-semibold text-ink" %><%= form.number_field :reorder_level, class: "form-input tabular", min: 0, step: "0.001", inputmode: "decimal", required: true %><p class="mt-1 text-[11px] text-ink-muted"><%= t("inventory.reorder_hint") %></p></div>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div><h2 class="section-title"><%= t("inventory.pricing_supplier") %></h2><p class="supporting-text"><%= t("inventory.pricing_supplier_description") %></p></div>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div><%= form.label :cost_price, t("inventory.cost_price"), class: "text-xs font-semibold text-ink" %><%= form.number_field :cost_price, class: "form-input tabular", min: 0, step: "0.01", inputmode: "decimal", required: true %></div>
+      <div><%= form.label :selling_price, t("inventory.selling_price"), class: "text-xs font-semibold text-ink" %><%= form.number_field :selling_price, class: "form-input tabular", min: 0, step: "0.01", inputmode: "decimal", required: true %></div>
+      <div><%= form.label :supplier_name, t("inventory.supplier"), class: "text-xs font-semibold text-ink" %><%= form.text_field :supplier_name, class: "form-input", autocomplete: "organization" %></div>
+      <div><%= form.label :supplier_contact, t("inventory.supplier_contact"), class: "text-xs font-semibold text-ink" %><%= form.text_field :supplier_contact, class: "form-input", autocomplete: "tel" %></div>
+    </div>
+  </section>
+
+  <section class="form-section">
+    <div><h2 class="section-title"><%= t("inventory.reference_details") %></h2><p class="supporting-text"><%= t("inventory.reference_details_description") %></p></div>
+    <div class="mt-4"><%= form.label :image, t("inventory.image"), class: "text-xs font-semibold text-ink" %><div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center"><div class="relative"><% if inventory_item.image.attached? %><%= image_tag inventory_item.image.variant(:thumb), alt: "", class: "size-24 rounded-xl border border-line object-cover", data: { image_preview_target: "placeholder" } %><% else %><span class="grid size-24 place-items-center rounded-xl border border-line bg-surface-muted text-ink-muted" data-image-preview-target="placeholder"><%= ui_icon("inventory", size: 26) %></span><% end %><img alt="" class="hidden size-24 rounded-xl border border-line object-cover" data-image-preview-target="preview"></div><div class="min-w-0 flex-1"><%= form.file_field :image, accept: "image/jpeg,image/png,image/webp", class: "file-input mt-0", data: { image_preview_target: "input", action: "change->image-preview#preview" } %><p class="mt-1 text-[11px] text-ink-muted"><%= t("inventory.image_hint") %></p><% if inventory_item.image.attached? %><label class="mt-2 inline-flex items-center gap-2 text-xs font-medium text-[#b42318]"><%= form.check_box :remove_image, class: "size-4 rounded border-line" %><%= t("inventory.remove_image") %></label><% end %></div></div></div>
+    <div class="mt-4"><%= form.label :notes, t("inventory.notes"), class: "text-xs font-semibold text-ink" %><%= form.text_area :notes, rows: 4, class: "form-input", placeholder: t("inventory.notes_placeholder") %></div>
+  </section>
+
+  <div class="sticky-actions"><%= link_to t("forms.cancel"), inventory_item.persisted? ? inventory_item_path(inventory_item) : inventory_items_path, class: "button-secondary flex-1 sm:flex-none" %><%= form.submit t("inventory.save_item"), class: "button-primary flex-1 sm:flex-none" %></div>
+<% end %>

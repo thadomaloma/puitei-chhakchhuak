@@ -1,0 +1,22 @@
+<% content_for :title, t("design_shares.title") %>
+<%= render "shared/page_header", eyebrow: t("design_shares.eyebrow"), title: t("design_shares.title"), description: t("design_shares.description"), action: (link_to(ui_icon("plus", size: 16) + t("design_shares.new"), new_design_share_path, class: "button-primary") if policy(DesignShare).create?) %>
+<%= render "shared/design_studio_navigation" %>
+
+<% if @design_shares.any? %>
+  <div class="mt-5 overflow-hidden rounded-2xl border border-line bg-surface shadow-card">
+    <div class="hidden grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_8rem_7rem_5rem] gap-4 border-b border-line bg-surface-muted px-4 py-3 text-[10px] font-semibold uppercase tracking-wide text-ink-muted md:grid">
+      <span><%= t("design_shares.share") %></span><span><%= t("design_shares.customer") %></span><span><%= t("design_shares.expires") %></span><span><%= t("design_shares.status") %></span><span></span>
+    </div>
+    <% @design_shares.each do |share| %>
+      <article class="grid gap-3 border-b border-line px-4 py-4 last:border-0 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_8rem_7rem_5rem] md:items-center md:gap-4">
+        <div><%= link_to share.title.presence || t("design_shares.untitled"), design_share_path(share), class: "text-sm font-semibold text-ink hover:text-brand" %><p class="mt-0.5 text-[11px] text-ink-muted"><%= t("design_shares.design_count", count: share.design_share_items.size) %> · •••<%= share.token_hint %></p></div>
+        <div><p class="text-xs font-semibold text-ink"><%= share.customer.full_name %></p><p class="text-[11px] text-ink-muted"><%= share.customer.phone_number %></p></div>
+        <p class="text-xs tabular text-ink-muted"><%= l(share.expires_at.to_date) %></p>
+        <div><%= status_badge(share.active? ? "active" : (share.revoked_at? ? "revoked" : "expired"), label: t("design_shares.statuses.#{share.active? ? 'active' : (share.revoked_at? ? 'revoked' : 'expired')}"), variant: share.active? ? "success" : "neutral") %></div>
+        <%= link_to t("forms.view"), design_share_path(share), class: "button-ghost button-sm justify-self-start md:justify-self-end" %>
+      </article>
+    <% end %>
+  </div>
+<% else %>
+  <div class="mt-5"><%= render "shared/empty_state", title: t("design_shares.empty"), description: t("design_shares.empty_description"), icon: "customers", action: (link_to(t("design_shares.new"), new_design_share_path, class: "button-primary") if policy(DesignShare).create?) %></div>
+<% end %>

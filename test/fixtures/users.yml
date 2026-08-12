@@ -1,0 +1,99 @@
+owner:
+  employee_code: STF-MAIN-0001
+  joined_on: 2024-01-01
+  name: Owner User
+  email: owner@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 0
+  active: true
+  branch: main
+
+manager:
+  employee_code: STF-MAIN-0002
+  joined_on: 2024-01-02
+  name: Manager User
+  email: manager@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 1
+  active: true
+  branch: main
+
+receptionist:
+  employee_code: STF-MAIN-0003
+  joined_on: 2024-01-03
+  name: Receptionist User
+  email: reception@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 2
+  active: true
+  branch: main
+
+cashier:
+  employee_code: STF-MAIN-0004
+  joined_on: 2024-01-04
+  name: Cashier User
+  email: cashier@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 3
+  active: true
+  branch: main
+
+tailor:
+  employee_code: STF-MAIN-0005
+  joined_on: 2024-01-05
+  name: Tailor User
+  email: tailor@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 4
+  active: true
+  branch: main
+
+cutting:
+  employee_code: STF-MAIN-0006
+  joined_on: 2024-01-06
+  name: Cutting User
+  email: cutting@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 5
+  active: true
+  branch: main
+
+embroidery:
+  employee_code: STF-MAIN-0007
+  joined_on: 2024-01-07
+  name: Embroidery User
+  email: embroidery@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 6
+  active: true
+  branch: main
+
+ironing:
+  employee_code: STF-MAIN-0008
+  joined_on: 2024-01-08
+  name: Ironing User
+  email: ironing@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 7
+  active: true
+  branch: main
+
+inactive:
+  employee_code: STF-MAIN-0009
+  joined_on: 2024-01-09
+  name: Inactive User
+  email: inactive@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 2
+  active: false
+  branch: main
+
+second_manager:
+  employee_code: STF-SECOND-0010
+  joined_on: 2024-01-10
+  name: Other Manager
+  email: other@example.test
+  encrypted_password: <%= Devise::Encryptor.digest(User, "Password-123!") %>
+  role: 1
+  active: true
+  branch: second

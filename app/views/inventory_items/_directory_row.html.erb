@@ -1,0 +1,10 @@
+<tr>
+  <td><div class="flex items-center gap-3"><% if item.image.attached? %><%= image_tag item.image.variant(:thumb), alt: "", class: "size-10 rounded-xl border border-line object-cover" %><% else %><span class="grid size-10 shrink-0 place-items-center rounded-xl bg-surface-muted text-ink-muted"><%= ui_icon("inventory", size: 18) %></span><% end %><div class="min-w-0"><%= link_to item.name, item, class: "block truncate font-semibold text-ink hover:text-emerald-refined" %><p class="truncate font-mono text-[10px] text-ink-muted"><%= item.sku %><% if item.color.present? %> · <%= item.color %><% end %></p></div></div></td>
+  <td><p class="text-sm text-ink"><%= t("inventory.categories.#{item.category}") %></p><p class="mt-1 text-[11px] text-ink-muted"><%= item.supplier_name.presence || "—" %></p></td>
+  <td class="tabular"><%= stock_quantity(item.quantity_on_hand, item.unit) %></td>
+  <td class="tabular text-ink-muted"><%= stock_quantity(item.quantity_reserved, item.unit) %></td>
+  <td><p class="tabular font-semibold text-ink"><%= stock_quantity(item.available_quantity, item.unit) %></p><p class="mt-1 text-[11px] text-ink-muted"><%= t("inventory.reorder_at", quantity: stock_quantity(item.reorder_level, item.unit)) %></p></td>
+  <td><% if item.active? %><%= inventory_stock_badge(item) %><% else %><%= status_badge("archived", label: t("inventory.archived_label")) %><% end %></td>
+  <td class="tabular text-right font-semibold"><%= money(item.quantity_on_hand * item.cost_price) %></td>
+  <td class="text-right"><%= link_to item, class: "button-ghost button-icon button-sm", aria: { label: t("inventory.open_item", item: item.name) } do %><%= ui_icon("chevron-right", size: 15) %><% end %></td>
+</tr>

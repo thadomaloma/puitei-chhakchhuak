@@ -1,0 +1,40 @@
+<aside class="sticky top-0 hidden h-dvh flex-col border-r border-line bg-surface lg:flex">
+  <div class="px-4 pb-3 pt-4"><%= render "shared/brand" %></div>
+
+  <nav class="flex-1 overflow-y-auto px-3 py-4" aria-label="<%= t("navigation.primary") %>">
+    <p class="px-2.5 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-ink-muted/70"><%= t("navigation.workspace") %></p>
+    <div class="space-y-0.5">
+      <%= render "shared/nav_item", label: t("navigation.dashboard"), path: root_path, icon: "dashboard", active: nav_active?("dashboard") %>
+      <% if policy(Order).index? %><%= render "shared/nav_item", label: t("navigation.orders"), path: orders_path, icon: "orders", active: nav_active?("orders") %><% end %>
+      <% if policy(Customer).index? %><%= render "shared/nav_item", label: t("navigation.customers"), path: customers_path, icon: "customers", active: nav_active?("customers") %><% end %>
+      <% if policy(MeasurementProfile).index? %><%= render "shared/nav_item", label: t("navigation.measurements"), path: measurements_path, icon: "ruler", active: nav_active?("measurement_profiles", "measurements") %><% end %>
+      <% if policy(Design).index? %><%= render "shared/nav_item", label: t("navigation.designs"), path: designs_path, icon: "designs", active: nav_active?("designs", "design_collections", "design_collection_items") %><% end %>
+      <%= render "shared/nav_item", label: t("navigation.production"), path: production_path, icon: "production", active: nav_active?("productions", "production_tasks") %>
+    </div>
+
+    <% if policy(Payment).index? || policy(Delivery).index? || policy(InventoryItem).index? || policy(Expense).index? || policy(:report).index? %>
+      <p class="mt-5 px-2.5 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-ink-muted/70"><%= t("navigation.business") %></p>
+      <div class="space-y-0.5">
+        <% if policy(Payment).index? %><%= render "shared/nav_item", label: t("navigation.payments"), path: payments_path, icon: "payments", active: nav_active?("payments") %><% end %>
+        <% if policy(Delivery).index? %><%= render "shared/nav_item", label: t("navigation.deliveries"), path: deliveries_path, icon: "delivery", active: nav_active?("deliveries") %><% end %>
+        <% if policy(InventoryItem).index? %><%= render "shared/nav_item", label: t("navigation.inventory"), path: inventory_items_path, icon: "inventory", active: nav_active?("inventory_items", "stock_movements") %><% end %>
+        <% if policy(Expense).index? %><%= render "shared/nav_item", label: t("navigation.expenses"), path: expenses_path, icon: "expenses", active: nav_active?("expenses") %><% end %>
+        <% if policy(:report).index? %><%= render "shared/nav_item", label: t("navigation.reports"), path: reports_path, icon: "reports", active: nav_active?("reports") %><% end %>
+      </div>
+    <% end %>
+
+    <% if policy(User).index? %>
+      <p class="mt-5 px-2.5 pb-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-ink-muted/70"><%= t("navigation.manage") %></p>
+      <div class="space-y-0.5">
+        <%= render "shared/nav_item", label: t("navigation.staff"), path: staff_index_path, icon: "staff", active: nav_active?("staff", "attendance_records", "leave_requests", "work_shifts", "staff_invitations") %>
+        <% if policy(current_shop).update? %><%= render "shared/nav_item", label: t("navigation.shop_settings"), path: onboarding_path, icon: "settings", active: nav_active?("onboardings") %><% end %>
+        <% if policy(current_branch.shop_setting).show? %><%= render "shared/nav_item", label: t("navigation.payment_settings"), path: payment_setting_path, icon: "payments", active: nav_active?("payment_settings") %><% end %>
+      </div>
+    <% end %>
+  </nav>
+
+  <div class="border-t border-line p-3">
+    <div class="flex items-center gap-2.5 px-2 py-1.5"><%= render "shared/avatar", name: current_user.name, size: "sm" %><div class="min-w-0 flex-1"><p class="truncate text-[12px] font-semibold text-ink"><%= current_user.name %></p><p class="truncate text-[10px] text-ink-muted"><%= current_membership.role.humanize %></p></div></div>
+    <%= button_to destroy_user_session_path, method: :delete, class: "button-ghost button-sm mt-1 w-full justify-start", aria: { label: t("sessions.sign_out") } do %><%= ui_icon("logout", size: 15) %><%= t("sessions.sign_out") %><% end %>
+  </div>
+</aside>

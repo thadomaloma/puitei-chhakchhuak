@@ -1,0 +1,19 @@
+bridal:
+  shop: primary
+  created_by: manager
+  name: Bridal Collection
+  description: Ceremony-ready references.
+  visibility: 1
+  active: true
+  position: 1
+  design_collection_items_count: 1
+
+foreign_collection:
+  shop: foreign
+  created_by: manager
+  name: Foreign Collection
+  description: Must never be visible to the primary tenant.
+  visibility: 0
+  active: true
+  position: 1
+  design_collection_items_count: 1

@@ -1,0 +1,12 @@
+<% chip_class = filter[:key] == :query ? "collection-filter-chip-search" : "collection-filter-chip-neutral" %>
+<span class="collection-filter-chip <%= chip_class %>">
+  <span class="collection-filter-chip-copy">
+    <span class="collection-filter-chip-label"><%= filter[:type_label] %>:</span>
+    <%= tag.span filter[:display_value],
+      class: "collection-filter-chip-value",
+      title: (filter[:display_value] if filter[:key] == :query) %>
+  </span>
+  <%= link_to filter[:remove_path], class: "collection-filter-chip-remove", aria: { label: filter[:remove_label] } do %>
+    <%= ui_icon("x", size: 13) %>
+  <% end %>
+</span>

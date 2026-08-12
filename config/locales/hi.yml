@@ -1,0 +1,29 @@
+hi:
+  app:
+    name: "Puitei Chhakchhuak"
+    tagline: "आपके व्यवसाय के अनुरूप"
+  authorization:
+    denied: "आपको यह कार्य करने की अनुमति नहीं है।"
+  navigation:
+    dashboard: "डैशबोर्ड"
+    orders: "ऑर्डर"
+    customers: "ग्राहक"
+    designs: "डिज़ाइन स्टूडियो"
+    payment_settings: "भुगतान सेटिंग"
+  customers:
+    title: "ग्राहक"
+    new: "नया ग्राहक"
+    edit: "ग्राहक संपादित करें"
+  measurement_profiles:
+    title: "माप प्रोफ़ाइल"
+    new: "नई माप प्रोफ़ाइल"
+  measurements:
+    new: "माप दर्ज करें"
+    history: "माप इतिहास"
+  workflow:
+    customer: "ग्राहक"
+    measurement: "माप"
+    order: "ऑर्डर"
+    production: "उत्पादन"
+    payment: "भुगतान"
+    delivery: "डिलीवरी"

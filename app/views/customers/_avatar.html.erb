@@ -1,0 +1,6 @@
+<% size_class = local_assigns.fetch(:size_class, "size-12") %>
+<% if customer.profile_photo.attached? %>
+  <%= image_tag customer.profile_photo.variant(:thumb), alt: "", class: "#{size_class} shrink-0 rounded-xl object-cover" %>
+<% else %>
+  <span class="grid <%= size_class %> shrink-0 place-items-center rounded-xl border border-line bg-surface-muted font-semibold text-brand" aria-hidden="true"><%= customer.initials %></span>
+<% end %>

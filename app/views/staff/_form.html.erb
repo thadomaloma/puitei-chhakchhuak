@@ -1,0 +1,22 @@
+<%= form_with model: staff_member, url: (staff_member.persisted? ? staff_path(staff_member) : staff_index_path), class: "space-y-5" do |form| %>
+  <%= render "shared/form_errors", record: staff_member %>
+  <section class="section-card">
+    <h2 class="section-title"><%= t("staff.identity") %></h2><p class="supporting-text"><%= t("staff.identity_description") %></p>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div><%= form.label :name, t("staff.name"), class: "form-label" %><%= form.text_field :name, class: "form-input", required: true, autofocus: true %></div>
+      <div><%= form.label :email, t("staff.email"), class: "form-label" %><%= form.email_field :email, class: "form-input", required: true, autocomplete: "email" %></div>
+      <div><%= form.label :phone_number, t("staff.phone"), class: "form-label" %><%= form.telephone_field :phone_number, class: "form-input", inputmode: "tel" %></div>
+      <div><%= form.label :job_title, t("staff.job_title"), class: "form-label" %><%= form.text_field :job_title, class: "form-input", placeholder: t("staff.job_title_placeholder") %></div>
+      <div><%= form.label :role, t("staff.role"), class: "form-label" %><%= form.select :role, (current_user.owner? ? User.roles.keys : User.roles.keys - %w[owner manager]).map { |role| [ t("staff.roles.#{role}"), role ] }, {}, class: "form-select" %></div>
+      <div><%= form.label :joined_on, t("staff.joined_on"), class: "form-label" %><%= form.date_field :joined_on, class: "form-input", required: true %></div>
+      <div class="sm:col-span-2"><%= form.label :emergency_contact, t("staff.emergency_contact"), class: "form-label" %><%= form.text_field :emergency_contact, class: "form-input", placeholder: t("staff.emergency_contact_placeholder") %></div>
+      <% if staff_member.persisted? %><div class="sm:col-span-2"><label class="flex min-h-11 items-center gap-2 rounded-lg border border-line px-3 text-xs font-semibold text-ink"><%= form.check_box :active, class: "size-4 rounded border-line text-brand" %><%= t("staff.active_account") %></label></div><% end %>
+    </div>
+  </section>
+
+  <% if policy(staff_member).compensation? %><section class="section-card"><h2 class="section-title"><%= t("staff.compensation") %></h2><p class="supporting-text"><%= t("staff.compensation_description") %></p><div class="mt-4 grid gap-4 sm:grid-cols-2"><div><%= form.label :pay_basis, t("staff.pay_basis"), class: "form-label" %><%= form.select :pay_basis, User.pay_bases.keys.map { |basis| [ t("staff.pay_bases.#{basis}"), basis ] }, {}, class: "form-select" %></div><div><%= form.label :pay_rate, t("staff.pay_rate"), class: "form-label" %><div class="relative"><span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-ink-muted"><%= current_branch.shop_setting.currency %></span><%= form.number_field :pay_rate, min: 0, step: 0.01, class: "form-input pl-12", inputmode: "decimal" %></div></div></div></section><% end %>
+
+  <section class="section-card"><h2 class="section-title"><%= t("staff.account_access") %></h2><p class="supporting-text"><%= staff_member.persisted? ? t("staff.password_optional") : t("staff.password_required") %></p><div class="mt-4 grid gap-4 sm:grid-cols-2"><div><%= form.label :password, t("staff.password"), class: "form-label" %><%= form.password_field :password, class: "form-input", required: staff_member.new_record?, autocomplete: "new-password", minlength: 12 %></div><div><%= form.label :password_confirmation, t("staff.password_confirmation"), class: "form-label" %><%= form.password_field :password_confirmation, class: "form-input", required: staff_member.new_record?, autocomplete: "new-password", minlength: 12 %></div></div></section>
+
+  <div class="sticky-actions justify-end"><%= link_to t("forms.cancel"), staff_member.persisted? ? staff_path(staff_member) : staff_index_path, class: "button-secondary" %><%= form.submit staff_member.persisted? ? t("staff.save_changes") : t("staff.create_account"), class: "button-primary" %></div>
+<% end %>

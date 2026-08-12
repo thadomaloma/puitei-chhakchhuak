@@ -1,0 +1,7 @@
+<% if (image = cover_design&.primary_image_attachment) %>
+  <%= image_tag image.variant(:collection_cover), alt: alt, class: "size-full object-cover #{local_assigns[:class_name]}", loading: (local_assigns[:loading] || "lazy"), width: 960, height: 600 %>
+<% else %>
+  <span class="grid size-full place-items-center bg-[radial-gradient(circle_at_50%_30%,#fff9eb_0%,#f6f2e9_52%,#eef0f3_100%)] px-5 text-center text-ink-muted">
+    <span><span class="mx-auto grid size-12 place-items-center rounded-2xl border border-white/80 bg-white/75 text-gold shadow-sm"><%= ui_icon("designs", size: 24) %></span><span class="mt-3 block text-[11px] font-semibold text-ink-muted"><%= t("design_collections.cover_placeholder") %></span></span>
+  </span>
+<% end %>
