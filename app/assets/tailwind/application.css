@@ -65,8 +65,8 @@
 }
 
 @layer base {
-  html { @apply bg-page font-sans text-ink; }
-  body { @apply min-h-screen bg-page text-ink antialiased; font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
+  html { @apply bg-page font-sans text-ink; touch-action: pan-x pan-y; }
+  body { @apply min-h-screen bg-page text-ink antialiased; touch-action: pan-x pan-y; font-feature-settings: "cv02", "cv03", "cv04", "cv11"; }
   ::selection { background: color-mix(in srgb, var(--tf-focus) 24%, transparent); }
   :focus-visible { outline: 2px solid var(--tf-focus); outline-offset: 2px; }
   button, a, input, select, textarea { touch-action: manipulation; }
