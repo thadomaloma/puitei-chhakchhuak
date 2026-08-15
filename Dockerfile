@@ -2,8 +2,8 @@
 # check=error=true
 
 # This Dockerfile is designed for production, including Railway:
-# docker build -t tailor_flow .
-# docker run -d -p 3000:3000 --env-file .env.production --name tailor_flow tailor_flow
+# docker build -t puitei-chhakchhuak .
+# docker run -d -p 3000:3000 --env-file .env.production --name puitei-chhakchhuak puitei-chhakchhuak
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 

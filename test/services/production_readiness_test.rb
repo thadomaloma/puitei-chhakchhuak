@@ -18,13 +18,13 @@ class ProductionReadinessTest < ActiveSupport::TestCase
     error = assert_raises(RuntimeError) { ProductionReadiness.check_environment!({}) }
 
     ProductionReadiness::REQUIRED_ENVIRONMENT.each { |name| assert_includes error.message, name }
-    assert_includes error.message, "DATABASE_URL or TAILOR_FLOW_DATABASE_PASSWORD"
+    assert_includes error.message, "DATABASE_URL or PUITEI_DATABASE_PASSWORD"
     assert_includes error.message, "RAILS_MASTER_KEY or SECRET_KEY_BASE"
   end
 
   test "accepts database password and master key alternatives" do
     environment = COMPLETE_ENVIRONMENT.except("DATABASE_URL", "SECRET_KEY_BASE").merge(
-      "TAILOR_FLOW_DATABASE_PASSWORD" => "database-secret", "RAILS_MASTER_KEY" => "master-key"
+      "PUITEI_DATABASE_PASSWORD" => "database-secret", "RAILS_MASTER_KEY" => "master-key"
     )
 
     assert_empty ProductionReadiness.missing_environment(environment)

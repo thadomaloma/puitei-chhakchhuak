@@ -6,7 +6,7 @@ class ProductionReadiness
 
   def self.missing_environment(environment = ENV)
     missing = REQUIRED_ENVIRONMENT.select { |name| environment[name].blank? }
-    missing << "DATABASE_URL or TAILOR_FLOW_DATABASE_PASSWORD" unless database_configured?(environment)
+    missing << "DATABASE_URL or PUITEI_DATABASE_PASSWORD" unless database_configured?(environment)
     missing << "RAILS_MASTER_KEY or SECRET_KEY_BASE" unless secret_configured?(environment)
     missing.concat(RAILWAY_STORAGE_ENVIRONMENT.select { |name| environment[name].blank? }) if railway_storage?(environment)
     if railway?(environment) && environment["ACTIVE_STORAGE_SERVICE"] == "local"
@@ -35,7 +35,7 @@ class ProductionReadiness
   end
 
   def self.database_configured?(environment)
-    environment["DATABASE_URL"].present? || environment["TAILOR_FLOW_DATABASE_PASSWORD"].present?
+    environment["DATABASE_URL"].present? || environment["PUITEI_DATABASE_PASSWORD"].present?
   end
   private_class_method :database_configured?
 

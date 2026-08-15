@@ -11,7 +11,7 @@ Puitei Chhakchhuak fails fast when a production web container starts without its
 | `MAILER_FROM` | Verified sender address. |
 | `SMTP_ADDRESS` | SMTP server hostname. |
 | `ACTIVE_STORAGE_SERVICE` | A key from `config/storage.yml`; Railway must use `railway`, never `local`. |
-| `DATABASE_URL` or `TAILOR_FLOW_DATABASE_PASSWORD` | PostgreSQL credential. Railway should reference `Postgres.DATABASE_URL`. |
+| `DATABASE_URL` or `PUITEI_DATABASE_PASSWORD` | PostgreSQL credential. Railway should reference `Postgres.DATABASE_URL`. |
 | `RAILS_MASTER_KEY` or `SECRET_KEY_BASE` | Rails secret. `RAILS_MASTER_KEY` is preferred when encrypted credentials are used. |
 
 Selecting `ACTIVE_STORAGE_SERVICE=railway` additionally requires `AWS_ENDPOINT_URL`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_BUCKET_NAME`, and `AWS_DEFAULT_REGION`. SMTP supports `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_AUTHENTICATION`, and `SMTP_STARTTLS`.
