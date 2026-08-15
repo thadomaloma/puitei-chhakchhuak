@@ -44,7 +44,7 @@ class ProductionReadinessTest < ActiveSupport::TestCase
       "AWS_ENDPOINT_URL" => "https://storage.railway.app",
       "AWS_ACCESS_KEY_ID" => "access-key",
       "AWS_SECRET_ACCESS_KEY" => "secret-key",
-      "AWS_S3_BUCKET_NAME" => "tailorflow-uploads-abc123",
+      "AWS_S3_BUCKET_NAME" => "puitei-uploads-abc123",
       "AWS_DEFAULT_REGION" => "auto"
     )
 
@@ -52,7 +52,7 @@ class ProductionReadinessTest < ActiveSupport::TestCase
   end
 
   test "rejects ephemeral local uploads on Railway" do
-    environment = COMPLETE_ENVIRONMENT.merge("RAILWAY_SERVICE_ID" => "tailorflow-service")
+    environment = COMPLETE_ENVIRONMENT.merge("RAILWAY_SERVICE_ID" => "puitei-service")
 
     assert_includes ProductionReadiness.missing_environment(environment), "non-local ACTIVE_STORAGE_SERVICE on Railway"
   end

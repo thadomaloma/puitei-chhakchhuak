@@ -2,7 +2,7 @@ class ProductionOwnerBootstrap
   Result = Data.define(:shop, :branch, :owner, :created)
 
   REQUIRED_ENVIRONMENT = %w[BOOTSTRAP_OWNER_EMAIL BOOTSTRAP_OWNER_PASSWORD].freeze
-  FORBIDDEN_PASSWORD_FRAGMENTS = %w[tailorflow-dev dev-2026 password].freeze
+  FORBIDDEN_PASSWORD_FRAGMENTS = %w[dev-2026 password].freeze
 
   def self.call!(environment = ENV)
     new(environment).call!

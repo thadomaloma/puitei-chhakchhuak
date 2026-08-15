@@ -14,7 +14,7 @@ class ProductionOwnerBootstrapTest < ActiveSupport::TestCase
     error = assert_raises(RuntimeError) do
       ProductionOwnerBootstrap.call!(
         "BOOTSTRAP_OWNER_EMAIL" => "new-owner@example.test",
-        "BOOTSTRAP_OWNER_PASSWORD" => "TailorFlow-Dev-2026!"
+        "BOOTSTRAP_OWNER_PASSWORD" => "Example-Dev-2026!Password"
       )
     end
 
