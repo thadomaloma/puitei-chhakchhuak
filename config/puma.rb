@@ -28,6 +28,12 @@
 threads_count = ENV.fetch("RAILS_MAX_THREADS", 3)
 threads threads_count, threads_count
 
+# Puma reads WEB_CONCURRENCY as a worker count on its own even when `workers` is
+# never called here, so a stray WEB_CONCURRENCY=1 silently starts cluster mode
+# with a single worker. This deployment's architecture (Solid Queue supervisor
+# embedded in Puma) is single-process by design, so pin it explicitly.
+workers 0
+
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
 port ENV.fetch("PORT", 3000)
 
