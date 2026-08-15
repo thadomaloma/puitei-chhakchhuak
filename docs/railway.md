@@ -43,7 +43,7 @@ For a custom domain, set `APP_HOST` to the custom hostname without `https://`. K
 
 1. build the immutable image and precompile assets;
 2. run `./bin/rails db:prepare` once as a pre-deploy command;
-3. start `./bin/thrust ./bin/rails server`, with Thruster receiving Railway traffic on port 80 and proxying to Puma;
+3. start `./bin/thrust ./bin/rails server`, with Thruster receiving Railway traffic on port 8080 and proxying to Puma;
 4. wait for `GET /health/ready` to return HTTP 200 before switching traffic;
 5. restart a crashed service up to ten times.
 
