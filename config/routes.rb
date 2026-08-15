@@ -107,6 +107,7 @@ Rails.application.routes.draw do
   resources :stock_movements, only: :create
 
   get "production", to: "productions#index", as: :production
+  get "schedule", to: "schedule#show", as: :schedule
   resources :production_tasks, only: [] do
     member do
       patch :claim

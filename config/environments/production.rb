@@ -21,7 +21,8 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
+  # Railway's application filesystem is ephemeral. Production deployments should
+  # set this to `railway`; ProductionReadiness rejects `local` on Railway.
   config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "local").to_sym
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
@@ -85,7 +86,10 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
   # Enable DNS rebinding protection and other `Host` header attacks.
-  config.hosts << ENV["APP_HOST"] if ENV["APP_HOST"].present?
+  [ ENV["APP_HOST"], ENV["RAILWAY_PUBLIC_DOMAIN"], *ENV.fetch("APP_HOSTS", "").split(",") ]
+    .filter_map { |host| host.to_s.strip.presence }
+    .uniq
+    .each { |host| config.hosts << host }
   #
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path.in?([ "/up", "/health/ready" ]) } }

@@ -133,6 +133,7 @@ module ApplicationHelper
     "measurements" => %w[measurement_profiles measurements],
     "designs" => %w[designs design_collections design_collection_items design_favourites design_selections design_shares],
     "production" => %w[productions production_tasks],
+    "schedule" => %w[schedule],
     "payments" => %w[payments],
     "inventory" => %w[inventory_items stock_movements],
     "expenses" => %w[expenses],
@@ -202,6 +203,31 @@ module ApplicationHelper
     when "overdue" then t("orders.delivery_states.overdue", count: (Date.current - order.delivery_date).to_i)
     when "due_soon" then t("orders.delivery_states.due_soon", count: (order.delivery_date - Date.current).to_i)
     else t("orders.delivery_states.upcoming", count: (order.delivery_date - Date.current).to_i)
+    end
+  end
+
+  # Customer contact numbers are stored as local digits with no country code
+  # (Customer#normalize_contact_details only strips non-digit characters).
+  # WhatsApp click-to-chat links require a full international number, so a
+  # 10-digit local number is assumed to be an Indian mobile number, matching
+  # the same +91/91 assumption ShopSetting already makes for gpay_number.
+  def whatsapp_url(number)
+    digits = number.to_s.gsub(/\D/, "")
+    return nil if digits.blank?
+
+    normalized = digits.length == 10 ? "91#{digits}" : digits
+    "https://wa.me/#{normalized}" if normalized.length.between?(11, 15)
+  end
+
+  def schedule_entry_icon(entry)
+    entry.fitting? ? "ruler" : "delivery"
+  end
+
+  def schedule_entry_label(entry)
+    if entry.overdue
+      entry.fitting? ? t("schedule.trial_overdue", count: entry.days_overdue) : t("schedule.delivery_overdue", count: entry.days_overdue)
+    else
+      entry.fitting? ? t("schedule.trial_scheduled", date: l(entry.date, format: :long)) : t("schedule.delivery_scheduled", date: l(entry.date, format: :long))
     end
   end
 

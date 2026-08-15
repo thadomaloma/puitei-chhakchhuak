@@ -18,3 +18,15 @@ other_shirt_v1:
   measured_on: <%= Date.current %>
   values:
     chest: "100.0"
+
+carol_dress_v1:
+  shop: primary
+  measurement_profile: carol_dress
+  created_by: receptionist
+  version: 1
+  measured_on: <%= Date.current - 10.days %>
+  values:
+    bust: "34.0"
+    waist: "28.0"
+    sleeve_length: "15.0"
+  notes: First version

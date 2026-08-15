@@ -12,4 +12,16 @@ namespace :production do
     ProductionReadiness.check_storage!
     puts "Puitei Chhakchhuak is ready to serve traffic."
   end
+
+  desc "Create the first production owner from one-time environment variables"
+  task bootstrap_owner: :environment do
+    unless Rails.env.production?
+      abort "production:bootstrap_owner is restricted to RAILS_ENV=production."
+    end
+
+    result = ProductionOwnerBootstrap.call!
+    action = result.created ? "created" : "already exists"
+    puts "Production owner #{action}: #{result.owner.email} (#{result.branch.name})."
+    puts "No password was printed. Remove or rotate the bootstrap password secret now."
+  end
 end

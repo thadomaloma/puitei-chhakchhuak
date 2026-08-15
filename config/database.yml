@@ -87,30 +87,18 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: tailor_flow_production
-    username: tailor_flow
+    <% if ENV["DATABASE_URL"] && !ENV["DATABASE_URL"].empty? %>
+    url: <%= ENV["DATABASE_URL"] %>
+    <% else %>
+    database: <%= ENV.fetch("DATABASE_NAME", "tailor_flow_production") %>
+    username: <%= ENV.fetch("DATABASE_USERNAME", "tailor_flow") %>
     password: <%= ENV["TAILOR_FLOW_DATABASE_PASSWORD"] %>
+    host: <%= ENV["DATABASE_HOST"] %>
+    port: <%= ENV.fetch("DATABASE_PORT", 5432) %>
+    <% end %>
   cache:
     <<: *primary_production
-    <% if ENV["CACHE_DATABASE_URL"] || ENV["DATABASE_URL"] %>
-    url: <%= ENV["CACHE_DATABASE_URL"] || ENV["DATABASE_URL"] %>
-    <% else %>
-    database: tailor_flow_production_cache
-    <% end %>
-    migrations_paths: db/cache_migrate
   queue:
     <<: *primary_production
-    <% if ENV["QUEUE_DATABASE_URL"] || ENV["DATABASE_URL"] %>
-    url: <%= ENV["QUEUE_DATABASE_URL"] || ENV["DATABASE_URL"] %>
-    <% else %>
-    database: tailor_flow_production_queue
-    <% end %>
-    migrations_paths: db/queue_migrate
   cable:
     <<: *primary_production
-    <% if ENV["CABLE_DATABASE_URL"] || ENV["DATABASE_URL"] %>
-    url: <%= ENV["CABLE_DATABASE_URL"] || ENV["DATABASE_URL"] %>
-    <% else %>
-    database: tailor_flow_production_cable
-    <% end %>
-    migrations_paths: db/cable_migrate

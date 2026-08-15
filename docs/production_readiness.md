@@ -1,25 +1,26 @@
 # Production readiness
 
-Puitei Chhakchhuak fails fast when a production web container starts without its deployment contract. The Docker entrypoint runs `bin/rails production:check_environment` before `db:prepare`.
+Puitei Chhakchhuak fails fast when a production web container starts without its deployment contract. The Docker entrypoint validates configuration, while Railway runs database preparation once as a pre-deploy command.
 
 ## Required environment
 
 | Variable | Purpose |
 | --- | --- |
-| `APP_HOST` | Public hostname without a scheme; also used for host authorization and mail links. |
+| `APP_HOST` | Public hostname without a scheme; used for mail links and host authorization. |
+| `APP_HOSTS` | Optional comma-separated host aliases. |
 | `MAILER_FROM` | Verified sender address. |
 | `SMTP_ADDRESS` | SMTP server hostname. |
-| `ACTIVE_STORAGE_SERVICE` | A key from `config/storage.yml`. Use `local` only with a durable mounted volume. |
-| `DATABASE_URL` | Preferred connection string; used for all database roles unless a role-specific URL overrides it. |
-| `RAILS_MASTER_KEY` | Decrypts production credentials. `SECRET_KEY_BASE` is accepted as an alternative when credentials are not required. |
+| `ACTIVE_STORAGE_SERVICE` | A key from `config/storage.yml`; Railway must use `railway`, never `local`. |
+| `DATABASE_URL` or `TAILOR_FLOW_DATABASE_PASSWORD` | PostgreSQL credential. Railway should reference `Postgres.DATABASE_URL`. |
+| `RAILS_MASTER_KEY` or `SECRET_KEY_BASE` | Rails secret. `RAILS_MASTER_KEY` is preferred when encrypted credentials are used. |
 
-`TAILOR_FLOW_DATABASE_PASSWORD` may replace `DATABASE_URL` when using the database names and user from `config/database.yml`. Large deployments may override the shared URL with `CACHE_DATABASE_URL`, `QUEUE_DATABASE_URL`, and `CABLE_DATABASE_URL`. SMTP also supports `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_AUTHENTICATION`, and `SMTP_STARTTLS`.
+Selecting `ACTIVE_STORAGE_SERVICE=railway` additionally requires `AWS_ENDPOINT_URL`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_S3_BUCKET_NAME`, and `AWS_DEFAULT_REGION`. SMTP supports `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `SMTP_AUTHENTICATION`, and `SMTP_STARTTLS`.
 
-Never commit a production `.env` file, master key, SMTP password, or database credential.
+Never commit a production environment file, master key, SMTP password, database URL, or bucket credential. Use Railway reference variables and seal manually entered secrets.
 
-## Deployment checks
+## Release gate
 
-Run the full release gate before building an image:
+Run before building an image:
 
 ```sh
 bin/rails test
@@ -30,19 +31,14 @@ bin/rails zeitwerk:check
 RAILS_ENV=production SECRET_KEY_BASE_DUMMY=1 bin/rails assets:precompile
 ```
 
-With production environment variables loaded, verify the live dependencies:
+With production variables loaded, `bin/rails production:readiness` verifies environment configuration, database connectivity, and Active Storage initialization. Production execution of `db/seeds.rb` is code-level disabled because it contains demonstration records. Use the idempotent `production:bootstrap_owner` task documented in `docs/railway.md`.
 
-```sh
-bin/rails production:readiness
-```
+## Health and rollback
 
-The readiness task verifies the environment, database connection, and Active Storage service. A successful release should run migrations once, start the web and Solid Queue processes, mount durable storage when `local` is selected, and retain database and upload backups.
+- `GET /up` proves Rails can boot.
+- `GET /health/ready` verifies database connectivity and is Railway's deployment health check.
+- A release stops if the Railway pre-deploy migration command fails.
+- Roll back the application image independently from the database. Only use backward-compatible migrations when old and new revisions may overlap.
+- Enable Railway PostgreSQL backups and keep an independent export of critical private bucket files; test restoration before launch.
 
-## Probes and rollback
-
-- `GET /up` proves that Rails can boot. It does not query the database.
-- `GET /health/ready` executes a lightweight database query. Route traffic only after it returns HTTP 200 with `{"status":"ready"}`.
-- Remove a failing instance from rotation when readiness returns HTTP 503. Review application and PostgreSQL logs by request ID before retrying.
-- Roll back the application image independently from the database. Phase 15 migrations add authentication columns and indexes and replace the attendance uniqueness index; do not reverse them while newer instances are running.
-
-After deployment, smoke-test sign-in, dashboard, customer and measurement lookup, order creation, production transitions, payment receipt, expense entry, delivery handover, staff attendance, and report export with a non-production tenant.
+After deployment, smoke-test sign-in, dashboard, customer and measurement lookup, order creation, production transitions, payment receipt, expense entry, delivery handover, staff attendance, report export, file upload, and email delivery with non-production records. See `docs/railway.md` for the complete runbook.

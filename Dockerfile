@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1
 # check=error=true
 
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
+# This Dockerfile is designed for production, including Railway:
 # docker build -t tailor_flow .
-# docker run -d -p 80:80 --env-file .env.production --name tailor_flow tailor_flow
+# docker run -d -p 3000:3000 --env-file .env.production --name tailor_flow tailor_flow
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
@@ -69,9 +69,10 @@ USER 1000:1000
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
 
-# Entrypoint prepares the database.
+# Entrypoint validates the runtime contract. Railway runs database migrations
+# once as a pre-deploy command before the new deployment receives traffic.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
-EXPOSE 80
+EXPOSE 3000
 CMD ["./bin/thrust", "./bin/rails", "server"]

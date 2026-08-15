@@ -1,5 +1,5 @@
-const CACHE_VERSION = "puitei-chhakchhuak-shell-v4"
-const SHELL_ASSETS = ["/offline", "/puitei-mark.svg", "/favicon-32.png", "/icon-192.png", "/icon.png", "/icon-maskable.png", "/apple-touch-icon.png"]
+const CACHE_VERSION = "puitei-chhakchhuak-shell-v6"
+const SHELL_ASSETS = ["/offline", "/offline.css", "/offline.js", "/puitei-mark.svg", "/favicon-32.png", "/icon-192.png", "/icon.png", "/icon-maskable.png", "/apple-touch-icon.png"]
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_VERSION).then(cache => cache.addAll(SHELL_ASSETS)))

@@ -10,6 +10,7 @@
       <% if policy(MeasurementProfile).index? %><%= render "shared/nav_item", label: t("navigation.measurements"), path: measurements_path, icon: "ruler", active: nav_active?("measurement_profiles", "measurements") %><% end %>
       <% if policy(Design).index? %><%= render "shared/nav_item", label: t("navigation.designs"), path: designs_path, icon: "designs", active: nav_active?("designs", "design_collections", "design_collection_items") %><% end %>
       <%= render "shared/nav_item", label: t("navigation.production"), path: production_path, icon: "production", active: nav_active?("productions", "production_tasks") %>
+      <%= render "shared/nav_item", label: t("navigation.schedule"), path: schedule_path, icon: "calendar", active: nav_active?("schedule") %>
     </div>
 
     <% if policy(Payment).index? || policy(Delivery).index? || policy(InventoryItem).index? || policy(Expense).index? || policy(:report).index? %>

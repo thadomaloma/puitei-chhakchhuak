@@ -14,3 +14,11 @@ other_shirt:
   name: Office shirt
   unit: centimetres
   active: true
+
+carol_dress:
+  shop: primary
+  customer: carol
+  measurement_template: blouse
+  name: Occasion dress
+  unit: inches
+  active: true

@@ -1,6 +1,10 @@
 require "chunky_png"
 require "stringio"
 
+if Rails.env.production?
+  puts "Production sample seeds are disabled. Use production:bootstrap_owner."
+else
+
 def design_preview_blob(background, fabric, accent, variation)
   image = ChunkyPNG::Image.new(480, 600, ChunkyPNG::Color.from_hex(background))
   fabric_color = ChunkyPNG::Color.from_hex(fabric)
@@ -588,3 +592,4 @@ puts "Seeded #{Design.count} designs across #{DesignCollection.count} design col
 puts "Seeded #{DesignSelection.count} customer design selections and #{DesignShare.count} secure design shares."
 puts "Development login: owner@puitei.test / #{password}" if Rails.env.development?
 puts "Second tenant login: esther@puitei.test / #{password}" if Rails.env.development?
+end

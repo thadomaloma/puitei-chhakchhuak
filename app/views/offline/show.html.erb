@@ -1,7 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#00142a"><link rel="icon" href="/puitei-mark.svg?v=1" type="image/svg+xml" sizes="any"><title>Puitei Chhakchhuak — Offline</title>
-    <style>body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box;background:#f7f8fa;color:#101828;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.card{max-width:400px;padding:28px;border:1px solid #e4e7ec;border-radius:16px;background:#fff;box-shadow:0 8px 24px #1018280d}.mark{display:block;width:48px;height:48px;border-radius:12px;box-shadow:0 4px 12px #00142a24}h1{margin:22px 0 8px;font-size:26px;letter-spacing:-.03em}p{line-height:1.55;color:#667085}a{display:grid;place-items:center;width:100%;min-height:44px;margin-top:14px;border:0;border-radius:8px;background:#00142a;color:#fff;font:inherit;font-weight:650;text-decoration:none;box-sizing:border-box}a:focus-visible{outline:2px solid #d9a441;outline-offset:2px}</style>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#00142a">
+    <meta name="robots" content="noindex,nofollow">
+    <title>You're Offline &mdash; Puitei Chhakchhuak</title>
+    <link rel="icon" href="/puitei-mark.svg?v=1" type="image/svg+xml" sizes="any">
+    <link rel="icon" href="/favicon-32.png?v=4" type="image/png" sizes="32x32">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=4" sizes="180x180">
+    <link rel="stylesheet" href="/offline.css">
   </head>
-  <body><main class="card"><img class="mark" src="/puitei-mark.svg" alt="Puitei Chhakchhuak"><h1>You're offline</h1><p>Puitei Chhakchhuak can't reach the shop server right now. Your data is safe—reconnect and try again. Avoid resubmitting a form until the connection returns.</p><a href="/">Try again</a></main></body>
+  <body>
+    <main class="offline-card">
+      <div class="offline-brand">
+        <img class="offline-mark" src="/puitei-mark.svg" alt="" width="28" height="28">
+        <span class="offline-brand-name">Puitei Chhakchhuak</span>
+      </div>
+
+      <div class="offline-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <line x1="2" y1="2" x2="22" y2="22"></line>
+          <path d="M8.5 16.5a5 5 0 0 1 7 0"></path>
+          <path d="M2 8.82a15 15 0 0 1 4.18-2.65"></path>
+          <path d="M10.66 5c4.02-.36 8.14.9 11.34 3.76"></path>
+          <path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"></path>
+          <path d="M5 13a10 10 0 0 1 5.24-2.76"></path>
+          <line x1="12" y1="20" x2="12.01" y2="20"></line>
+        </svg>
+      </div>
+
+      <h1>You're offline</h1>
+      <p class="offline-copy">Puitei Chhakchhuak can't connect right now. Check your internet connection and try again.</p>
+
+      <div class="offline-actions">
+        <form id="offline-retry-form" method="get" action="">
+          <button type="submit" id="offline-retry" class="offline-retry">Try Again</button>
+        </form>
+      </div>
+
+      <p class="offline-reassurance">Once your connection is back, you can continue where you left off.</p>
+
+      <p id="offline-status" class="offline-status" role="status" aria-live="polite">
+        <span class="offline-status-dot"></span>
+        <span id="offline-status-text">No internet connection</span>
+      </p>
+      <p id="offline-recovery" class="offline-recovery" hidden>
+        You're back online.
+        <button type="button" id="offline-continue" class="offline-continue">Continue</button>
+      </p>
+    </main>
+
+    <script src="/offline.js" defer></script>
+  </body>
 </html>

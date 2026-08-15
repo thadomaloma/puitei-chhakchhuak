@@ -11,6 +11,7 @@
       <% links << [t("navigation.measurements"), measurements_path, "ruler"] if policy(MeasurementProfile).index? %>
       <% links << [t("navigation.designs"), designs_path, "designs"] if policy(Design).index? %>
       <% links << [t("navigation.production"), production_path, "production"] %>
+      <% links << [t("navigation.schedule"), schedule_path, "calendar"] %>
       <% links << [t("navigation.deliveries"), deliveries_path, "delivery"] if policy(Delivery).index? %>
       <% links << [t("navigation.inventory"), inventory_items_path, "inventory"] if policy(InventoryItem).index? %>
       <% links << [t("navigation.expenses"), expenses_path, "expenses"] if policy(Expense).index? %>

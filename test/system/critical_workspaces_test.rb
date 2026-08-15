@@ -2,7 +2,7 @@ require "application_system_test_case"
 
 class CriticalWorkspacesTest < ApplicationSystemTestCase
   CORE_PATHS = %w[
-    / /customers /measurements /orders /production /inventory /deliveries
+    / /customers /measurements /orders /production /schedule /inventory /deliveries
     /payments /expenses /reports /staff /payment_setting
   ].freeze
 
@@ -46,7 +46,7 @@ class CriticalWorkspacesTest < ApplicationSystemTestCase
     assert_selector "#mobile-more-menu a", text: I18n.t("navigation.measurements")
     assert_selector "#mobile-more-menu a", text: I18n.t("navigation.reports")
     assert_selector "#mobile-more-menu a[href='#{payment_setting_path}']", text: I18n.t("navigation.payment_settings")
-    assert_no_selector "#mobile-more-menu a[href='#{subscription_path}']"
+    assert_no_selector "#mobile-more-menu a[href='/subscription']"
   end
 
   test "mobile collection filters and collection search remain accessible" do

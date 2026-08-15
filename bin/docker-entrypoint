@@ -1,9 +1,9 @@
 #!/bin/bash -e
 
-# If running the rails server then create or migrate existing database
+# Validate production configuration before accepting traffic. Migrations belong
+# to Railway's pre-deploy command, not every web container.
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails production:check_environment
-  ./bin/rails db:prepare
 fi
 
 exec "${@}"
