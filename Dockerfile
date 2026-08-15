@@ -3,7 +3,7 @@
 
 # This Dockerfile is designed for production, including Railway:
 # docker build -t puitei-chhakchhuak .
-# docker run -d -p 3000:3000 --env-file .env.production --name puitei-chhakchhuak puitei-chhakchhuak
+# docker run -d -p 3000:80 --env-file .env.production --name puitei-chhakchhuak puitei-chhakchhuak
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
@@ -74,5 +74,5 @@ COPY --chown=rails:rails --from=build /rails /rails
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
-EXPOSE 3000
+EXPOSE 80
 CMD ["./bin/thrust", "./bin/rails", "server"]
