@@ -96,8 +96,8 @@ branch.shop_setting.update!(
   }
 )
 
-password = if Rails.env.development?
-  ENV.fetch("SEED_PASSWORD", "Puitei-Dev-2026!")
+password = if Rails.env.test?
+  ENV.fetch("SEED_PASSWORD") { SecureRandom.base64(24) }
 else
   ENV.fetch("SEED_PASSWORD")
 end
@@ -586,5 +586,4 @@ puts "Seeded #{Expense.count} expenses with #{Expense.pending_review.count} pend
 puts "Seeded #{AttendanceRecord.count} attendance records, #{LeaveRequest.count} leave requests, and #{WorkShift.count} work shifts."
 puts "Seeded #{Design.count} designs across #{DesignCollection.count} design collections."
 puts "Seeded #{DesignSelection.count} customer design selections and #{DesignShare.count} secure design shares."
-puts "Development login: owner@puitei.test / #{password}" if Rails.env.development?
-puts "Second tenant login: esther@puitei.test / #{password}" if Rails.env.development?
+puts "Development sample accounts created with the supplied SEED_PASSWORD." if Rails.env.development?

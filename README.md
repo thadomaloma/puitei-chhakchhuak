@@ -19,21 +19,15 @@ Requirements: Ruby 4.0.3, PostgreSQL 14 or newer, and a platform supported by `t
 ```sh
 bundle install
 bin/rails db:prepare
-bin/rails db:seed
+SEED_PASSWORD='choose-a-local-development-password' bin/rails db:seed
 bin/dev
 ```
 
 The server is available at `http://localhost:3000`. Production forces HTTPS and validates its required environment before the container starts. See [Production readiness](docs/production_readiness.md) for the deployment contract and health checks.
 
-## Development logins
+## Development seed data
 
-- Primary tenant owner: `owner@puitei.test`
-- Second tenant owner: `esther@puitei.test`
-- Shared development password: `Puitei-Dev-2026!`
-
-The default password is only used when seeding in development. Set `SEED_PASSWORD` to override it. Seeding any other environment requires an explicit `SEED_PASSWORD`; no production password is embedded in the application.
-
-Additional seeded accounts use the same development password and are listed in `db/seeds.rb` for every Phase 1 role.
+Development seeds contain synthetic demonstration records only. Supply `SEED_PASSWORD` explicitly when seeding; no account password is embedded in the repository. Production sample seeding must never be used.
 
 ## Verification
 
