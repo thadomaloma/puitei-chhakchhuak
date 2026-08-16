@@ -5,6 +5,11 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_redirected_to new_user_session_path
+
+    follow_redirect!
+
+    assert_response :success
+    assert_select "div[role='alert']", text: I18n.t("devise.failure.unauthenticated"), count: 0
   end
 
   test "renders operational dashboard and responsive navigation for manager" do

@@ -1,0 +1,7 @@
+<div class="rounded-xl border border-gold bg-gold-soft/40 p-4" role="alert">
+  <p class="text-sm font-semibold text-ink"><%= t("customers.duplicate_found") %></p>
+  <div class="mt-2 flex items-center justify-between gap-3 rounded-lg bg-surface p-3">
+    <div class="min-w-0"><p class="truncate text-sm font-semibold text-ink"><%= customer.full_name %></p><p class="text-xs text-ink-muted"><%= customer.phone_number %></p></div>
+    <%= link_to t("customers.open_customer"), customer, class: "button-secondary button-sm shrink-0" %>
+  </div>
+</div>

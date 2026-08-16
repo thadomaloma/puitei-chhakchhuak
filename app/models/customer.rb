@@ -46,6 +46,12 @@ class Customer < ApplicationRecord
     full_name.split.filter_map { |part| part[0] }.first(2).join.upcase
   end
 
+  # Most customers only ever give the shop one number. WhatsApp is only a
+  # distinct field for the minority who use a different number for it.
+  def whatsapp_contact_number
+    whatsapp_number.presence || phone_number
+  end
+
   private
 
   def normalize_contact_details

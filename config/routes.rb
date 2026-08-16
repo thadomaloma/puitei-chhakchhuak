@@ -34,6 +34,9 @@ Rails.application.routes.draw do
     member do
       patch :archive
     end
+    collection do
+      get :instagram_preview
+    end
   end
 
   resources :design_selections, only: %i[new create update destroy] do

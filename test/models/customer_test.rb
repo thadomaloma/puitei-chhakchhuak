@@ -27,6 +27,20 @@ class CustomerTest < ActiveSupport::TestCase
     assert_includes Customer.search("CUS-ALICE"), customers(:alice)
   end
 
+  test "whatsapp_contact_number falls back to the phone number" do
+    customer = Customer.new(phone_number: "9876500099", whatsapp_number: nil)
+    assert_equal "9876500099", customer.whatsapp_contact_number
+
+    customer.whatsapp_number = "9123456780"
+    assert_equal "9123456780", customer.whatsapp_contact_number
+  end
+
+  test "minimal customer can be created with only a name and phone number" do
+    customer = Customer.new(branch: branches(:main), full_name: "Walk-in Customer", phone_number: "9876500098")
+
+    assert customer.valid?
+  end
+
   test "archive preserves the record and history" do
     customer = customers(:alice)
 
