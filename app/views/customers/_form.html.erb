@@ -5,7 +5,7 @@
   <section class="form-section">
     <div><h2 class="section-title"><%= t("customers.essentials") %></h2><p class="supporting-text"><%= t("customers.essentials_description") %></p></div>
     <div class="mt-4 grid gap-4 sm:grid-cols-2">
-      <div class="sm:col-span-2"><%= form.label :full_name, class: "form-label" %><%= form.text_field :full_name, required: true, autofocus: !customer.persisted?, autocomplete: "name", class: "form-input" %></div>
+      <div><%= form.label :full_name, class: "form-label" %><%= form.text_field :full_name, required: true, autofocus: !customer.persisted?, autocomplete: "name", class: "form-input" %></div>
       <div><%= form.label :phone_number, t("customers.phone_whatsapp"), class: "form-label" %><%= form.telephone_field :phone_number, required: true, autocomplete: "tel", inputmode: "tel", class: "form-input" %></div>
       <% if current_user.owner? && defined?(@available_branches) && @available_branches.many? %><div><%= form.label :branch_id, class: "form-label" %><%= form.collection_select :branch_id, @available_branches, :id, :name, {}, class: "form-select" %></div><% end %>
       <% if customer.persisted? %><div class="sm:col-span-2 rounded-lg bg-surface-muted p-3"><p class="detail-label"><%= t("customers.customer_code") %></p><p class="mt-1 font-mono text-xs font-semibold text-ink"><%= customer.customer_code %></p></div><% else %><p class="form-hint sm:col-span-2"><%= t("customers.code_generated_hint") %></p><% end %>
