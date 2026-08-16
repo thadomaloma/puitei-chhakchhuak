@@ -55,6 +55,76 @@ class DesignsControllerTest < ActionDispatch::IntegrationTest
     assert design.primary_image_blob_id.present?
   end
 
+  test "renders the new design form in instagram mode" do
+    sign_in users(:manager)
+
+    get new_design_path(source: "instagram")
+
+    assert_response :success
+    assert_select "input#design_source_url"
+  end
+
+  test "renders the design show page for an instagram reference with no uploaded image" do
+    sign_in users(:manager)
+    design = Design.create!(
+      shop: shops(:primary), uploaded_by: users(:manager), rights_confirmed_by: users(:manager),
+      rights_confirmed_at: Time.current, title: "IG design", garment_type: "blouse",
+      source_type: :customer_reference, source_url: "https://www.instagram.com/p/CzAbC12DeFg/"
+    )
+
+    get design_path(design)
+
+    assert_response :success
+    assert_select "a", text: I18n.t("designs.open_on_instagram")
+  end
+
+  test "receptionist adds an instagram reference without uploading an image" do
+    sign_in users(:receptionist)
+
+    assert_difference("Design.count") do
+      post designs_path, params: {
+        design: {
+          title: "Customer-shared blouse", garment_type: "blouse", visibility: "private",
+          source_type: "customer_reference", source_url: "https://www.instagram.com/p/CzAbC12DeFg/",
+          rights_confirmed: "1"
+        }
+      }
+    end
+
+    design = Design.order(:id).last
+    assert_redirected_to design_path(design)
+    assert design.instagram_reference?
+    assert_not design.images.attached?
+  end
+
+  test "instagram_preview validates the url before calling the oEmbed api" do
+    sign_in users(:receptionist)
+
+    get instagram_preview_designs_path, params: { url: "https://pinterest.com/pin/12345/" }, as: :json
+
+    assert_response :unprocessable_content
+    assert_equal false, JSON.parse(response.body)["valid"]
+  end
+
+  test "instagram_preview reports a recognized link even without oEmbed credentials configured" do
+    sign_in users(:receptionist)
+
+    get instagram_preview_designs_path, params: { url: "https://www.instagram.com/p/CzAbC12DeFg/" }, as: :json
+
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert body["valid"]
+    assert_equal false, body["preview_available"]
+  end
+
+  test "workshop staff cannot use the instagram preview endpoint" do
+    sign_in users(:tailor)
+
+    get instagram_preview_designs_path, params: { url: "https://www.instagram.com/p/CzAbC12DeFg/" }, as: :json
+
+    assert_redirected_to root_path
+  end
+
   test "manager updates primary image and removes only a scoped attachment" do
     design = designs(:blouse_reference)
     design.images.attach(uploaded_image("first.png"), uploaded_image("second.png"))

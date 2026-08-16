@@ -44,7 +44,7 @@ class Design < ApplicationRecord
   validates :rights_confirmed_at, :rights_confirmed_by, presence: true
   validate :garment_type_uses_existing_taxonomy
   validate :tenant_actors_belong_to_shop, on: :create
-  validate :at_least_one_image_remains
+  validate :at_least_one_image_remains, unless: -> { source_url.present? }
   validate :acceptable_images
   validate :primary_image_is_attached
 
@@ -79,6 +79,10 @@ class Design < ApplicationRecord
 
   def removable_image_ids
     Array(remove_image_ids).reject(&:blank?).map(&:to_s)
+  end
+
+  def instagram_reference?
+    Instagram::UrlValidator.valid?(source_url)
   end
 
   private

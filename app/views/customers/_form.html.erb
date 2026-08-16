@@ -1,8 +1,19 @@
 <%= form_with model: customer, class: "max-w-5xl space-y-5" do |form| %>
   <%= render "shared/form_errors", record: customer %>
+  <% if local_assigns[:duplicate_customer] %><%= render "duplicate_match", customer: duplicate_customer %><% end %>
 
-  <section class="form-section" data-controller="image-preview">
-    <div><h2 class="section-title"><%= t("customers.basic_details") %></h2><p class="supporting-text"><%= t("customers.basic_details_description") %></p></div>
+  <section class="form-section">
+    <div><h2 class="section-title"><%= t("customers.essentials") %></h2><p class="supporting-text"><%= t("customers.essentials_description") %></p></div>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2">
+      <div class="sm:col-span-2"><%= form.label :full_name, class: "form-label" %><%= form.text_field :full_name, required: true, autofocus: !customer.persisted?, autocomplete: "name", class: "form-input" %></div>
+      <div><%= form.label :phone_number, t("customers.phone_whatsapp"), class: "form-label" %><%= form.telephone_field :phone_number, required: true, autocomplete: "tel", inputmode: "tel", class: "form-input" %></div>
+      <% if current_user.owner? && defined?(@available_branches) && @available_branches.many? %><div><%= form.label :branch_id, class: "form-label" %><%= form.collection_select :branch_id, @available_branches, :id, :name, {}, class: "form-select" %></div><% end %>
+      <% if customer.persisted? %><div class="sm:col-span-2 rounded-lg bg-surface-muted p-3"><p class="detail-label"><%= t("customers.customer_code") %></p><p class="mt-1 font-mono text-xs font-semibold text-ink"><%= customer.customer_code %></p></div><% else %><p class="form-hint sm:col-span-2"><%= t("customers.code_generated_hint") %></p><% end %>
+    </div>
+  </section>
+
+  <details class="form-section" <%= "open" if customer.persisted? && (customer.whatsapp_number.presence || customer.email.presence || customer.address.presence || customer.city.presence || customer.notes.presence || customer.date_of_birth.presence || !customer.unspecified? || customer.profile_photo.attached?) %> data-controller="image-preview">
+    <summary class="cursor-pointer select-none"><h2 class="section-title inline"><%= t("customers.additional_details") %></h2><p class="supporting-text"><%= t("customers.additional_details_description") %></p></summary>
     <div class="mt-4 grid gap-5 md:grid-cols-[9rem_minmax(0,1fr)]">
       <div>
         <div class="grid aspect-square w-28 place-items-center overflow-hidden rounded-2xl border border-line bg-surface-muted text-xl font-semibold text-brand sm:w-32">
@@ -14,33 +25,17 @@
         <% if customer.profile_photo.attached? %><label class="mt-2 flex min-h-9 items-center gap-2 text-xs font-medium text-ink-muted"><%= check_box_tag "customer[remove_profile_photo]", "1", false, class: "size-4 rounded border-line text-brand" %><%= t("customers.remove_photo") %></label><% end %>
       </div>
       <div class="grid content-start gap-4 sm:grid-cols-2">
-        <div class="sm:col-span-2"><%= form.label :full_name, class: "form-label" %><%= form.text_field :full_name, required: true, autocomplete: "name", class: "form-input" %></div>
+        <div><%= form.label :whatsapp_number, t("customers.whatsapp_if_different"), class: "form-label" %><%= form.telephone_field :whatsapp_number, autocomplete: "tel", inputmode: "tel", class: "form-input" %><p class="form-hint"><%= t("customers.whatsapp_hint") %></p></div>
+        <div><%= form.label :email, class: "form-label" %><%= form.email_field :email, autocomplete: "email", inputmode: "email", class: "form-input" %></div>
         <div><%= form.label :gender, class: "form-label" %><%= form.select :gender, Customer.genders.keys.map { |gender| [gender.humanize, gender] }, {}, class: "form-select" %></div>
         <div><%= form.label :date_of_birth, class: "form-label" %><%= form.date_field :date_of_birth, max: Date.current, autocomplete: "bday", class: "form-input" %></div>
         <div><%= form.label :preferred_language, class: "form-label" %><%= form.select :preferred_language, [["English", "en"], ["Mizo", "lus"], ["Hindi", "hi"]], {}, class: "form-select" %></div>
-        <% if current_user.owner? && defined?(@available_branches) && @available_branches.many? %><div><%= form.label :branch_id, class: "form-label" %><%= form.collection_select :branch_id, @available_branches, :id, :name, {}, class: "form-select" %></div><% end %>
-        <% if customer.persisted? %><div class="sm:col-span-2 rounded-lg bg-surface-muted p-3"><p class="detail-label"><%= t("customers.customer_code") %></p><p class="mt-1 font-mono text-xs font-semibold text-ink"><%= customer.customer_code %></p></div><% else %><p class="form-hint sm:col-span-2"><%= t("customers.code_generated_hint") %></p><% end %>
+        <div><%= form.label :city, class: "form-label" %><%= form.text_field :city, autocomplete: "address-level2", class: "form-input" %></div>
+        <div class="sm:col-span-2"><%= form.label :address, class: "form-label" %><%= form.text_area :address, rows: 3, autocomplete: "street-address", class: "form-textarea" %></div>
+        <div class="sm:col-span-2"><%= form.label :notes, class: "form-label" %><%= form.text_area :notes, rows: 4, class: "form-textarea", placeholder: t("customers.notes_placeholder") %><p class="form-hint"><%= t("customers.notes_hint") %></p></div>
       </div>
     </div>
-  </section>
-
-  <section class="form-section">
-    <div><h2 class="section-title"><%= t("customers.contact_details") %></h2><p class="supporting-text"><%= t("customers.contact_description") %></p></div>
-    <div class="mt-4 grid gap-4 sm:grid-cols-2">
-      <div><%= form.label :phone_number, class: "form-label" %><%= form.telephone_field :phone_number, required: true, autocomplete: "tel", inputmode: "tel", class: "form-input" %></div>
-      <div><%= form.label :whatsapp_number, class: "form-label" %><%= form.telephone_field :whatsapp_number, autocomplete: "tel", inputmode: "tel", class: "form-input" %><p class="form-hint"><%= t("customers.whatsapp_hint") %></p></div>
-      <div class="sm:col-span-2"><%= form.label :email, class: "form-label" %><%= form.email_field :email, autocomplete: "email", inputmode: "email", class: "form-input" %></div>
-    </div>
-  </section>
-
-  <section class="form-section">
-    <div><h2 class="section-title"><%= t("customers.address_preferences") %></h2><p class="supporting-text"><%= t("customers.address_preferences_description") %></p></div>
-    <div class="mt-4 grid gap-4 sm:grid-cols-2">
-      <div><%= form.label :city, class: "form-label" %><%= form.text_field :city, autocomplete: "address-level2", class: "form-input" %></div>
-      <div class="sm:col-span-2"><%= form.label :address, class: "form-label" %><%= form.text_area :address, rows: 3, autocomplete: "street-address", class: "form-textarea" %></div>
-      <div class="sm:col-span-2"><%= form.label :notes, class: "form-label" %><%= form.text_area :notes, rows: 4, class: "form-textarea", placeholder: t("customers.notes_placeholder") %><p class="form-hint"><%= t("customers.notes_hint") %></p></div>
-    </div>
-  </section>
+  </details>
 
   <div class="sticky-actions justify-end">
     <%= link_to t("forms.cancel"), customer.persisted? ? customer_path(customer) : customers_path, class: "button-secondary flex-1 sm:flex-none" %>

@@ -30,6 +30,27 @@ class DesignTest < ActiveSupport::TestCase
     assert_not @design.valid?
   end
 
+  test "does not require an image when a reference source url is present" do
+    design = Design.new(
+      shop: shops(:primary), uploaded_by: users(:manager), rights_confirmed_by: users(:manager),
+      rights_confirmed_at: Time.current, title: "Instagram reference", garment_type: "blouse",
+      source_type: :customer_reference, source_url: "https://www.instagram.com/p/CzAbC12DeFg/"
+    )
+
+    assert design.valid?
+  end
+
+  test "instagram_reference? detects a valid instagram source url" do
+    @design.source_url = "https://www.instagram.com/p/CzAbC12DeFg/"
+    assert @design.instagram_reference?
+
+    @design.source_url = "https://pinterest.com/pin/12345/"
+    assert_not @design.instagram_reference?
+
+    @design.source_url = nil
+    assert_not @design.instagram_reference?
+  end
+
   test "searches useful design metadata and tags" do
     assert_includes Design.search("pearl"), @design
     assert_includes Design.search("silk"), @design

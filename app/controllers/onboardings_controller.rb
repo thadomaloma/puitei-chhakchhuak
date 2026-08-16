@@ -35,6 +35,6 @@ class OnboardingsController < ApplicationController
   end
 
   def settings_params
-    params.require(:shop).permit(:phone, :whatsapp_number, :email, :address, :currency, :measurement_unit, :invoice_prefix, :locale, :default_delivery_days)
+    params.require(:shop).permit(:phone, :whatsapp_number, :email, :address, :currency, :measurement_unit, :invoice_prefix, :locale, :default_delivery_days, :instagram_username)
   end
 end

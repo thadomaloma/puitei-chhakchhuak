@@ -1,4 +1,4 @@
 <% content_for :title, t("customers.new") %>
 <%= render "shared/back_link", path: customers_path, label: t("customers.title") %>
 <div class="mb-5 mt-3 max-w-5xl"><%= render "shared/page_header", eyebrow: t("customers.directory"), title: t("customers.new"), description: t("customers.new_description") %></div>
-<%= render "form", customer: @customer %>
+<%= render "form", customer: @customer, duplicate_customer: @duplicate_customer %>

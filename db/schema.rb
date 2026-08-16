@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_14_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_16_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -711,7 +711,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_100000) do
     t.index ["production_task_id", "created_at"], name: "index_production_events_on_production_task_id_and_created_at"
     t.index ["production_task_id"], name: "index_production_events_on_production_task_id"
     t.index ["shop_id"], name: "index_production_events_on_shop_id"
-    t.check_constraint "event_type::text = ANY (ARRAY['claimed'::character varying, 'assigned'::character varying, 'started'::character varying, 'completed'::character varying, 'skipped'::character varying, 'reopened'::character varying]::text[])", name: "production_events_type"
+    t.check_constraint "event_type::text = ANY (ARRAY['claimed'::character varying::text, 'assigned'::character varying::text, 'started'::character varying::text, 'completed'::character varying::text, 'skipped'::character varying::text, 'reopened'::character varying::text])", name: "production_events_type"
   end
 
   create_table "production_tasks", force: :cascade do |t|
@@ -750,6 +750,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_14_100000) do
     t.integer "default_delivery_days", default: 14, null: false
     t.string "email"
     t.string "gpay_number"
+    t.string "instagram_username"
     t.string "invoice_prefix", default: "TLR", null: false
     t.string "locale", default: "en", null: false
     t.integer "low_stock_threshold", default: 5, null: false

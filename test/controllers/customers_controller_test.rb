@@ -55,6 +55,22 @@ class CustomersControllerTest < ActionDispatch::IntegrationTest
     assert_select "a[href='#{customer_measurement_profile_path(customers(:alice), measurement_profiles(:alice_blouse))}']"
   end
 
+  test "renders the minimal new customer form" do
+    get new_customer_path
+
+    assert_response :success
+    assert_select "input#customer_full_name"
+    assert_select "input#customer_phone_number"
+  end
+
+  test "renders the edit form with legacy optional fields still available" do
+    customers(:alice).update!(gender: 1, date_of_birth: Date.new(1990, 1, 1), address: "Some address", notes: "note")
+
+    get edit_customer_path(customers(:alice))
+
+    assert_response :success
+  end
+
   test "creates a customer in the current branch" do
     assert_difference("Customer.count") do
       post customers_path, params: {
@@ -74,6 +90,16 @@ class CustomersControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_content
     assert_select "[role='alert']"
+  end
+
+  test "suggests the existing customer instead of a raw uniqueness error" do
+    assert_no_difference("Customer.count") do
+      post customers_path, params: { customer: { full_name: "Someone Else", phone_number: customers(:alice).phone_number, preferred_language: "en" } }
+    end
+
+    assert_response :unprocessable_content
+    assert_select "a[href='#{customer_path(customers(:alice))}']"
+    assert_no_match(/Phone number has already been taken/, response.body)
   end
 
   test "updates customer details" do

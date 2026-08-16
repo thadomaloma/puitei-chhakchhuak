@@ -1,3 +1,3 @@
-<% content_for :title, t("designs.new_title") %>
+<% content_for :title, @instagram_mode ? t("designs.new_instagram_title") : t("designs.new_title") %>
 <%= render "shared/back_link", path: designs_path, label: t("designs.title") %>
-<div class="mx-auto mt-3 max-w-6xl"><%= render "shared/page_header", eyebrow: t("designs.eyebrow"), title: t("designs.new"), description: t("designs.new_description") %><div class="mt-5"><%= render "form", design: @design %></div></div>
+<div class="mx-auto mt-3 max-w-6xl"><%= render "shared/page_header", eyebrow: t("designs.eyebrow"), title: (@instagram_mode ? t("designs.new_instagram") : t("designs.new")), description: (@instagram_mode ? t("designs.new_instagram_description") : t("designs.new_description")) %><div class="mt-5"><%= render "form", design: @design, instagram_mode: @instagram_mode %></div></div>

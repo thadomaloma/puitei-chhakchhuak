@@ -1,5 +1,8 @@
 <% content_for :title, t("designs.index_title") %>
-<%= render "shared/page_header", eyebrow: t("designs.eyebrow"), title: t("designs.title"), description: t("designs.description", count: @design_count), action: (link_to(ui_icon("plus", size: 17) + t("designs.upload"), new_design_path, class: "button-primary") if policy(Design).create?) %>
+<%= render "shared/page_header", eyebrow: t("designs.eyebrow"), title: t("designs.title"), description: t("designs.description", count: @design_count),
+  secondary_action: (link_to(t("designs.add_instagram_reference"), new_design_path(source: "instagram"), class: "button-secondary") if policy(Design).create?),
+  action: (link_to(ui_icon("plus", size: 17) + t("designs.upload"), new_design_path, class: "button-primary") if policy(Design).create?) %>
+<% if (instagram_url = current_branch.shop_setting.instagram_profile_url) %><p class="mt-2 text-xs"><%= link_to t("designs.open_shop_instagram"), instagram_url, target: "_blank", rel: "noopener noreferrer", class: "font-semibold text-emerald-refined" %></p><% end %>
 <%= render "shared/design_studio_navigation" %>
 
 <div class="mt-4 grid gap-3 sm:grid-cols-3">

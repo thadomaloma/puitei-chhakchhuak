@@ -26,6 +26,7 @@ class DesignsController < ApplicationController
 
   def show
     authorize @design
+    @instagram_preview = Instagram::OEmbedClient.fetch(@design.source_url) if @design.instagram_reference? && !@design.images.attached?
     @favourite = current_user.design_favourites.find_by(shop: current_shop, design: @design)
     @design_selections = if policy(DesignSelection).index?
       policy_scope(DesignSelection).active.where(design: @design)
@@ -36,7 +37,8 @@ class DesignsController < ApplicationController
   end
 
   def new
-    @design = current_shop.designs.new(visibility: :private, source_type: :original)
+    @instagram_mode = params[:source] == "instagram"
+    @design = current_shop.designs.new(visibility: :private, source_type: @instagram_mode ? :customer_reference : :original)
     authorize @design
   end
 
@@ -45,6 +47,7 @@ class DesignsController < ApplicationController
     @design.uploaded_by = current_user
     @design.rights_confirmed_by = current_user
     @design.rights_confirmed_at = Time.current if rights_confirmed?
+    @instagram_mode = @design.instagram_reference?
     authorize @design
 
     if @design.save
@@ -81,6 +84,23 @@ class DesignsController < ApplicationController
       @design.update!(active: false)
     end
     redirect_to designs_path, notice: t("designs.archived")
+  end
+
+  def instagram_preview
+    authorize Design, :create?
+
+    unless Instagram::UrlValidator.valid?(params[:url])
+      render json: { valid: false, error: "invalid_url" }, status: :unprocessable_content
+      return
+    end
+
+    result = Instagram::OEmbedClient.fetch(params[:url])
+    render json: {
+      valid: true,
+      preview_available: result.success?,
+      thumbnail_url: result.thumbnail_url,
+      author_name: result.author_name
+    }
   end
 
   private

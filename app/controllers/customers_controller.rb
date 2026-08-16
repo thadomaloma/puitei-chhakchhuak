@@ -73,6 +73,8 @@ class CustomersController < ApplicationController
     if @customer.save
       redirect_to @customer, notice: t("customers.created")
     else
+      @duplicate_customer = find_duplicate_customer
+      @customer.errors.delete(:phone_number) if @duplicate_customer
       render :new, status: :unprocessable_content
     end
   end
@@ -210,5 +212,11 @@ class CustomersController < ApplicationController
 
   def remove_profile_photo?
     ActiveModel::Type::Boolean.new.cast(customer_params[:remove_profile_photo]) && @customer.profile_photo.attached?
+  end
+
+  def find_duplicate_customer
+    return unless @customer.errors[:phone_number].present?
+
+    policy_scope(Customer).find_by(branch_id: @customer.branch_id, phone_number: @customer.phone_number)
   end
 end
